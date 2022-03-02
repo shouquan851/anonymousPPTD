@@ -38,8 +38,10 @@ class EdgeManager:
 
 # if __name__ == '__main__':
 #     print('PyCharm')
-# public_key_list, private_key_list = EdgeManager.generate_dh_key(int(params.edgeNumber))
+# public_key_list, private_key_list = EdgeManager.generate_dh_key(int(params.edge_number))
 # aes_key_list_all_edge = EdgeManager.generate_aes_key(public_key_list, private_key_list)
+# for aes_key_list_one_edge in aes_key_list_all_edge:
+#     print(aes_key_list_one_edge)
 
 # encrypt = Encrypt()
 # ct = Encrypt.aes_encryptor(aes_key_list_all_edge[0][1], b"a" * 16)
