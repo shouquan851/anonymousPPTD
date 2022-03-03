@@ -5,11 +5,15 @@ from utils.Encrypt import Encrypt
 
 
 class ClientManager:
+    public_key_client_list = list()
+    private_key_client_list = list()
+    aes_key_list_all_group = list()
+    client_data_all_group = list()
+
     def __init__(self):
         print("init ClientManager")
 
-    @staticmethod
-    def generate_dh_key(client_count):
+    def generate_dh_key(self, client_count):
         encrypt = Encrypt()
         public_key_list = list()
         private_key_list = list()
@@ -17,10 +21,10 @@ class ClientManager:
             private_key, public_key = encrypt.generate_dh_key()
             public_key_list.append(public_key)
             private_key_list.append(private_key)
-        return public_key_list, private_key_list
+        self.public_key_client_list = public_key_list
+        self.private_key_client_list = private_key_list
 
-    @staticmethod
-    def generate_aes_key(public_key_list, private_key_list):
+    def generate_aes_key(self):
         encrypt = Encrypt()
         # 为每个组内的所有用户和其他所有用户协商对称密钥
         count = 0  # 已处理过的组的用户数量
@@ -33,26 +37,64 @@ class ClientManager:
                 aes_key_list_one_client = list()
                 for client_pub_index in range(groupNumber):
                     # 生成对称密钥
-                    aes_key = encrypt.generate_aes_key(private_key_list[count + client_pri_index],
-                                                       public_key_list[count + client_pri_index],
-                                                       public_key_list[count + client_pub_index])
+                    aes_key = encrypt.generate_aes_key(self.private_key_client_list[count + client_pri_index],
+                                                       self.public_key_client_list[count + client_pri_index],
+                                                       self.public_key_client_list[count + client_pub_index])
                     aes_key_list_one_client.append(aes_key)
                 aes_key_list_all_client.append(aes_key_list_one_client)
             aes_key_list_all_group.append(aes_key_list_all_client)
             count += groupNumber
             print("第%d组处理完毕,已处理%d个用户" % (group_index, count))
-        return aes_key_list_all_group
+        self.aes_key_list_all_group = aes_key_list_all_group
 
+    def load_data(self, client_data):
+        '''
+        把生成的整个系统的用户数据切分给到各个组的用户中去
+        :param client_data:整个系统的用户数据
+        :return:
+        '''
+        count = 0
+        for group_index in range(len(params.group_number_list)):
+            client_data_one_group = list()
+            for client_index_in_group in range(params.group_number_list[group_index]):
+                client_data_one_group.append(client_data[count + client_index_in_group])
+            self.client_data_all_group.append(client_data_one_group)
+            count += params.group_number_list[group_index]
 
-start = time.perf_counter()
-public_key_list, private_key_list = ClientManager.generate_dh_key(int(params.client_number))
-end = time.perf_counter()
-print("为所有用户生成密钥用时%d" % (end - start))
-
-start = time.perf_counter()
-aes_key_list_all_group = ClientManager.generate_aes_key(public_key_list, private_key_list)
-end = time.perf_counter()
-print("为所有用户交换密钥用时%d" % (end - start))
+    def generate_update_data(self, add_noise_index_all_group):
+        '''
+        根据数据添加位置,生成处理过的数据       还没写完,需要再去处理add_noise_index_all_group
+        :param add_noise_index_all_group:
+        :return:
+        '''
+        if len(self.client_data_all_group) is 0:
+            print("还未加载数据")
+            return
+        client_masking_data_all_group = list()
+        # 逐个处理每个组
+        for group_index in range(len(self.client_data_all_group)):
+            client_masking_data_one_group = list()
+            # 逐个处理组内每个用户的数据
+            for client_index in range(len(self.client_data_all_group[group_index])):
+                client_masking_data_one = list()
+                # 逐个处理每个用户的每个任务
+                for m in range(params.M):
+                    client_masking_data_one_task = list()
+                    # 逐个处理每个任务的数据
+                    for data_index in range(len(self.client_data_all_group[group_index])):
+                        # 当前位置是用户添加数据的位置,就添加数据,否则就只添加噪声000000
+                        if data_index != add_noise_index_all_group[group_index][client_index]:
+                            client_masking_data_one_task.append(0000000)
+                        else:
+                            client_masking_data_one_task.append(
+                                0000000 + self.client_data_all_group[group_index][client_index][m])
+                    # 把该任务处理后的数据添加进去
+                    client_masking_data_one.append(client_masking_data_one_task)
+                # 把单个用户的数据添加到组内
+                client_masking_data_one_group.append(client_masking_data_one)
+            # 把单组用户的数据添加到所有组的数据中
+            client_masking_data_all_group.append(client_masking_data_one_group)
+        return client_masking_data_all_group
 
 # 打印密钥交换结果
 # for aes_key_list_one_group in aes_key_list_all_group:

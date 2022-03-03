@@ -3,11 +3,14 @@ from utils.Encrypt import Encrypt
 
 
 class EdgeManager:
+    public_key_edge_list = list()
+    private_key_edge_list = list()
+    aes_key_list_all_edge = list()
+
     def __init__(self):
         print("init EdgeManager")
 
-    @staticmethod
-    def generate_dh_key(edge_count):
+    def generate_dh_key(self, edge_count):
         encrypt = Encrypt()
         public_key_list = list()
         private_key_list = list()
@@ -15,26 +18,23 @@ class EdgeManager:
             private_key, public_key = encrypt.generate_dh_key()
             public_key_list.append(public_key)
             private_key_list.append(private_key)
-        # print(private_key_list)
-        # print(public_key_list)
-        return public_key_list, private_key_list
+        self.public_key_edge_list = public_key_list
+        self.private_key_edge_list = private_key_list
 
-    @staticmethod
-    def generate_aes_key(public_key_list, private_key_list):
+    def generate_aes_key(self):
         encrypt = Encrypt()
         # 为所有边缘节点和其他所有边缘节点协商对称密钥
         aes_key_list_all_edge = list()
-        for edge_index in range(len(private_key_list)):
+        for edge_index in range(len(self.private_key_edge_list)):
             # 逐个处理每个边缘节点
             aes_key_list_one_edge = list()
-            for public_key in public_key_list:
+            for public_key in self.public_key_edge_list:
                 # 生成对称密钥
-                aes_key = encrypt.generate_aes_key(private_key_list[edge_index], public_key_list[edge_index],
+                aes_key = encrypt.generate_aes_key(self.private_key_edge_list[edge_index], self.public_key_edge_list[edge_index],
                                                    public_key)
                 aes_key_list_one_edge.append(aes_key)
             aes_key_list_all_edge.append(aes_key_list_one_edge)
-        return aes_key_list_all_edge
-
+        self.aes_key_list_all_edge = aes_key_list_all_edge
 
 # if __name__ == '__main__':
 #     print('PyCharm')

@@ -14,18 +14,10 @@ class Encrypt:
     def __init__(self):
         self.parameters = dh.DHParameterNumbers(p=params.p, g=params.g, q=None, ).parameters()
 
-    '''
-    生成DH公私钥
-    '''
-
     def generate_dh_key(self):
         private_key = self.parameters.generate_private_key()
         public_key = private_key.public_key()
         return private_key.private_numbers().x, public_key.public_numbers().y
-
-    '''
-    生成对称密钥
-    '''
 
     def generate_aes_key(self, a_private_key, a_public_key, b_public_key):
         # 生成公私钥
@@ -42,20 +34,12 @@ class Encrypt:
         ).derive(shared_key)
         return derived_key
 
-    '''
-    aes加密
-    '''
-
     @staticmethod
     def aes_encryptor(key, plaintext):
         cipher = Cipher(algorithms.AES(key), modes.ECB())
         encryptor = cipher.encryptor()
         ct = encryptor.update(bytes(plaintext)) + encryptor.finalize()
         return ct
-
-    '''
-    aes解密
-    '''
 
     @staticmethod
     def aes_decryptor(key, ciphertext):
