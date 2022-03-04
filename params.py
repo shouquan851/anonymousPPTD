@@ -1,4 +1,4 @@
-edge_number = 10
+edge_number = 2
 client_number = 30
 group_number_list = [10, 20]
 
