@@ -82,7 +82,7 @@ class ClientManager:
                     client_masking_data_one_task = list()
                     # 逐个处理每个任务的数据
                     for data_index in range(len(self.client_data_all_group[group_index])):
-                        # 当前位置是用户添加数据的位置,就添加数据,否则就只添加噪声000000
+                        # 当前位置是用户添加数据的位置,就添加数据,否则就只添加噪声  暂时的噪声用的是100000000,回头得使用masking机制去添加
                         if data_index != add_noise_index_all_group[group_index][client_index]:
                             client_masking_data_one_task.append(10000000)
                         else:

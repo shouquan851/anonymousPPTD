@@ -12,6 +12,8 @@ class EdgeManager:
     en_all_edge_client_data_index = list()
     de_one_group_client_data_index = list()
     all_group_in_client_data_index = list()
+    all_group_aggreagtion_client_data = list()
+    edge_masking_data_all_group = list()
 
     def __init__(self):
         print("init EdgeManager")
@@ -97,6 +99,71 @@ class EdgeManager:
             random.shuffle(one_group_in_group_client_data_index)
             self.all_group_in_client_data_index.append(one_group_in_group_client_data_index)
 
+    def aggregation_all_group_client_data(self, client_masking_data_all_group):
+        # 边缘节点聚合用户数据
+        for client_masking_data_one_group in client_masking_data_all_group:
+            # 逐组处理
+            one_group_aggreagtion_client_data = list()
+            for m in range(params.M):
+                # 每组中逐任务处理
+                one_task_group_aggregation_client_data = list()
+                for client_index in range(len(client_masking_data_one_group)):
+                    # 先生成长度为k的向量
+                    one_task_group_aggregation_client_data.append(0)
+                for client_index1 in range(len(client_masking_data_one_group)):
+                    # 逐列聚合用户的数据
+                    for client_index2 in range(len(client_masking_data_one_group)):
+                        one_task_group_aggregation_client_data[client_index1] += \
+                            client_masking_data_one_group[client_index2][m][client_index1]
+                one_group_aggreagtion_client_data.append(one_task_group_aggregation_client_data)
+            self.all_group_aggreagtion_client_data.append(one_group_aggreagtion_client_data)
+
+    def generate_edge_masking_data_all_group(self):
+        '''
+        边缘节点生成要上传给服务器的数据,此处噪声先用00000000代替
+        :return:
+        '''
+        for edge_index in range(params.edge_number):
+            edge_masking_data_one_group = list()
+            # 边缘节点初始化要上传的数据矩阵
+            for m in range(params.M):
+                edge_masking_data_one_task_one_group = list()
+                for k in range(params.client_number):
+                    edge_masking_data_one_task_one_group.append(0)
+                edge_masking_data_one_group.append(edge_masking_data_one_task_one_group)
+            # 边缘节点将数据添加到初始化后的数据矩阵
+            for m in range(params.M):
+                temp_list = copy.copy(self.de_one_group_client_data_index[edge_index])
+                for k in range(params.client_number):
+                    if k in temp_list:
+                        index = temp_list.index(k)
+                        edge_masking_data_one_group[m][k] += self.all_group_aggreagtion_client_data[edge_index][m][
+                            index]
+                    else:
+                        edge_masking_data_one_group[m][k] += 10000
+            self.edge_masking_data_all_group.append(edge_masking_data_one_group)
+
+    def generate_edge_masking_data_all_group_2(self):
+        '''
+        边缘节点生成要上传给服务器的数据,此处噪声先用00000000代替
+        :return:
+        '''
+        for edge_index in range(params.edge_number):
+            edge_masking_data_one_group = list()
+            # 边缘节点初始化要上传的数据矩阵,此处先把masking的噪声添加了
+            for m in range(params.M):
+                edge_masking_data_one_task_one_group = list()
+                for k in range(params.client_number):
+                    edge_masking_data_one_task_one_group.append(10000)
+                edge_masking_data_one_group.append(edge_masking_data_one_task_one_group)
+            # 边缘节点将数据添加到初始化后的数据矩阵
+            for m in range(params.M):
+                count = 0
+                for client_data_index in self.de_one_group_client_data_index[edge_index]:
+                    edge_masking_data_one_group[m][client_data_index] += self.all_group_aggreagtion_client_data[edge_index][m][count]
+                    edge_masking_data_one_group[m][client_data_index] += 100000
+                    count += 1
+            self.edge_masking_data_all_group.append(edge_masking_data_one_group)
 
 if __name__ == '__main__':
     # 测试一下协商数据添加位置的方式

@@ -77,6 +77,8 @@ class Encrypt:
 # print(Encrypt.aes_decryptor(key, Encrypt.aes_encryptor(key, b"a" * 16)))
 #
 # text = [15, 21, 9, 28, 18, 12, 11, 24, 19, 0]
+# print(text.index(9))
+# print(text.index(10))
 # ct = Encrypt.aes_list_encryptor(key, text)
 # print(ct)
 # print(ct[0:10])

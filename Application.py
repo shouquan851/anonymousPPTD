@@ -51,8 +51,6 @@ class Application:
         # 生成整个系统的用户数据
         self.dataGenerator.generate_base_data(10, 0, 100, 80)
         client_data = self.dataGenerator.generate_client_data()
-        for client_data_one in client_data:
-            print(client_data_one)
         # 将用户数据加载到clientManager中
         self.clientManager.load_data(client_data)
         index = 1
@@ -81,3 +79,11 @@ class Application:
     def client_upload_data(self, all_group_in_client_data_index):
         # 根据数据添加位置处理用户数据
         return self.clientManager.generate_update_data(all_group_in_client_data_index)
+
+    def edge_aggregation_client_data(self, client_masking_data_all_group):
+        self.edgeManager.aggregation_all_group_client_data(client_masking_data_all_group)
+        return self.edgeManager.all_group_aggreagtion_client_data
+
+    def edge_generate_edge_masking_data_all_group(self):
+        self.edgeManager.generate_edge_masking_data_all_group_2()
+        return self.edgeManager.edge_masking_data_all_group
