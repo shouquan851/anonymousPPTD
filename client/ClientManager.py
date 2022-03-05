@@ -63,11 +63,11 @@ class ClientManager:
 
     def generate_update_data(self, add_noise_index_all_group):
         '''
-        根据数据添加位置,生成处理过的数据       还没写完,需要再去处理add_noise_index_all_group
+        根据数据添加位置,生成处理过的数据
         :param add_noise_index_all_group:
         :return:
         '''
-        if len(self.client_data_all_group) is 0:
+        if len(self.client_data_all_group) == 0:
             print("还未加载数据")
             return
         client_masking_data_all_group = list()
@@ -84,10 +84,10 @@ class ClientManager:
                     for data_index in range(len(self.client_data_all_group[group_index])):
                         # 当前位置是用户添加数据的位置,就添加数据,否则就只添加噪声000000
                         if data_index != add_noise_index_all_group[group_index][client_index]:
-                            client_masking_data_one_task.append(0000000)
+                            client_masking_data_one_task.append(10000000)
                         else:
                             client_masking_data_one_task.append(
-                                0000000 + self.client_data_all_group[group_index][client_index][m])
+                                10000000 + self.client_data_all_group[group_index][client_index][m])
                     # 把该任务处理后的数据添加进去
                     client_masking_data_one.append(client_masking_data_one_task)
                 # 把单个用户的数据添加到组内

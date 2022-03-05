@@ -4,6 +4,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import dh
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from gmssl import func
 
 import params
 
@@ -50,33 +51,35 @@ class Encrypt:
 
     @staticmethod
     def aes_list_encryptor(key, plain_list):
-        cipher = Cipher(algorithms.AES(key), modes.ECB())
+        cipher = Cipher(algorithms.AES(key), modes.CFB(b"a" * 16))
         encryptor = cipher.encryptor()
         ct = encryptor.update(bytes(plain_list)) + encryptor.finalize()
         return ct
 
     @staticmethod
     def aes_list_decryptor(key, ciphertext):
-        cipher = Cipher(algorithms.AES(key), modes.ECB())
+        cipher = Cipher(algorithms.AES(key), modes.CFB(b"a" * 16))
         decryptor = cipher.decryptor()
         dt = decryptor.update(ciphertext) + decryptor.finalize()
-        return dt
+        return func.bytes_to_list(dt)
 
 
-if __name__ == '__main__':
-    print('PyCharm')
-encrypt = Encrypt()
-a_pri, a_pub = encrypt.generate_dh_key()
-b_pri, b_pub = encrypt.generate_dh_key()
-key = encrypt.generate_aes_key(a_pri, a_pub, b_pub)
-key1 = encrypt.generate_aes_key(b_pri, b_pub, a_pub)
-print(key)
-print(key1)
-print(key == key1)
-print(Encrypt.aes_decryptor(key, Encrypt.aes_encryptor(key, b"a" * 16)))
-
-text = [15, 21, 9, 28, 18, 12, 11, 24, 19, 0]
-ct = Encrypt.aes_list_encryptor(key, text)
-print(ct)
-dt = Encrypt.aes_list_decryptor(key1, ct)
-print(dt)
+# if __name__ == '__main__':
+#     print('PyCharm')
+# encrypt = Encrypt()
+# a_pri, a_pub = encrypt.generate_dh_key()
+# b_pri, b_pub = encrypt.generate_dh_key()
+# key = encrypt.generate_aes_key(a_pri, a_pub, b_pub)
+# key1 = encrypt.generate_aes_key(b_pri, b_pub, a_pub)
+# print(key)
+# print(key1)
+# print(key == key1)
+# print(Encrypt.aes_decryptor(key, Encrypt.aes_encryptor(key, b"a" * 16)))
+#
+# text = [15, 21, 9, 28, 18, 12, 11, 24, 19, 0]
+# ct = Encrypt.aes_list_encryptor(key, text)
+# print(ct)
+# print(ct[0:10])
+# print(func.bytes_to_list(ct))
+# dt = Encrypt.aes_list_decryptor(key1, ct)
+# print(dt)

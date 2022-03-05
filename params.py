@@ -1,6 +1,6 @@
-edge_number = 2
-client_number = 30
-group_number_list = [10, 20]
+edge_number = 10
+client_number = 100
+group_number_list = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
 
 # datagenerate
 # 可靠程度,越接近100 越可靠
