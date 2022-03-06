@@ -6,6 +6,7 @@ import params
 class DataGenerator:
     base_data = list()
     reliable_client = list()
+    all_client_data = list()
 
     def __init__(self):
         print("init DataGenerator")
@@ -38,6 +39,7 @@ class DataGenerator:
             for m in range(params.M):
                 # 生成高斯噪声,模拟用户观测不准确
                 noise = self.base_data[m] * random.gauss(0, self.reliable_client[k])
-                one_client_data.append(self.base_data[m] + noise)
+                one_client_data.append(self.base_data[m] + noise*0.2)
             all_client_data.append(one_client_data)
-        return all_client_data
+        self.all_client_data = all_client_data
+        return self.all_client_data

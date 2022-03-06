@@ -45,6 +45,7 @@ class ClientManager:
             aes_key_list_all_group.append(aes_key_list_all_client)
             count += groupNumber
             print("第%d组处理完毕,已处理%d个用户" % (group_index, count))
+            group_index += 1
         self.aes_key_list_all_group = aes_key_list_all_group
 
     def load_data(self, client_data):
@@ -84,10 +85,10 @@ class ClientManager:
                     for data_index in range(len(self.client_data_all_group[group_index])):
                         # 当前位置是用户添加数据的位置,就添加数据,否则就只添加噪声  暂时的噪声用的是100000000,回头得使用masking机制去添加
                         if data_index != add_noise_index_all_group[group_index][client_index]:
-                            client_masking_data_one_task.append(10000000)
+                            client_masking_data_one_task.append(params.client_noise)
                         else:
                             client_masking_data_one_task.append(
-                                10000000 + self.client_data_all_group[group_index][client_index][m])
+                                params.client_noise + self.client_data_all_group[group_index][client_index][m])
                     # 把该任务处理后的数据添加进去
                     client_masking_data_one.append(client_masking_data_one_task)
                 # 把单个用户的数据添加到组内

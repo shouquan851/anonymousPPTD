@@ -92,7 +92,7 @@ class EdgeManager:
         各个边缘节点为组内用户分配组内数据添加位置
         :return:
         '''
-        for edge_index in range(params.edge_number):
+        for edge_index in range(len(params.group_number_list)):
             one_group_in_group_client_data_index = list()
             for i in range(params.group_number_list[edge_index]):
                 one_group_in_group_client_data_index.append(i)
@@ -140,7 +140,7 @@ class EdgeManager:
                         edge_masking_data_one_group[m][k] += self.all_group_aggreagtion_client_data[edge_index][m][
                             index]
                     else:
-                        edge_masking_data_one_group[m][k] += 10000
+                        edge_masking_data_one_group[m][k] += params.edge_noise
             self.edge_masking_data_all_group.append(edge_masking_data_one_group)
 
     def generate_edge_masking_data_all_group_2(self):
@@ -154,16 +154,18 @@ class EdgeManager:
             for m in range(params.M):
                 edge_masking_data_one_task_one_group = list()
                 for k in range(params.client_number):
-                    edge_masking_data_one_task_one_group.append(10000)
+                    edge_masking_data_one_task_one_group.append(params.edge_noise)
                 edge_masking_data_one_group.append(edge_masking_data_one_task_one_group)
             # 边缘节点将数据添加到初始化后的数据矩阵
             for m in range(params.M):
                 count = 0
                 for client_data_index in self.de_one_group_client_data_index[edge_index]:
-                    edge_masking_data_one_group[m][client_data_index] += self.all_group_aggreagtion_client_data[edge_index][m][count]
-                    edge_masking_data_one_group[m][client_data_index] += 100000
+                    edge_masking_data_one_group[m][client_data_index] += \
+                    self.all_group_aggreagtion_client_data[edge_index][m][count]
+                    edge_masking_data_one_group[m][client_data_index] += params.edge_noise
                     count += 1
             self.edge_masking_data_all_group.append(edge_masking_data_one_group)
+
 
 if __name__ == '__main__':
     # 测试一下协商数据添加位置的方式

@@ -5,6 +5,7 @@ from client.ClientManager import ClientManager
 from cloud_server.CloudServer import CloudServer
 from data_generator.DataGenerator import DataGenerator
 from edge_server.EdgeManager import EdgeManager
+from utils.TD_CRH import TD_CRH
 
 
 class Application:
@@ -49,7 +50,10 @@ class Application:
 
     def data_generator(self):
         # 生成整个系统的用户数据
-        self.dataGenerator.generate_base_data(10, 0, 100, 80)
+        self.dataGenerator.generate_base_data(10, 0, 100, 99)
+        # 打印basedata
+        print("basedata")
+        print(self.dataGenerator.base_data)
         client_data = self.dataGenerator.generate_client_data()
         # 将用户数据加载到clientManager中
         self.clientManager.load_data(client_data)
@@ -70,9 +74,12 @@ class Application:
         self.edgeManager.generate_en_client_data_index()
         self.edgeManager.generate_de_group_client_data_index(edge_index,
                                                              self.edgeManager.en_all_edge_client_data_index[edge_index])
+        # 边缘节点总体数据添加位置
+        print("边缘节点总体数据添加位置")
         print(self.edgeManager.de_one_group_client_data_index)
         # 各个边缘节点生成组内用户数据添加位置
         self.edgeManager.generate_in_group_client_data_index()
+        print("各边缘节点内部用户数据添加位置")
         print(self.edgeManager.all_group_in_client_data_index)
         return self.edgeManager.all_group_in_client_data_index
 
@@ -87,3 +94,17 @@ class Application:
     def edge_generate_edge_masking_data_all_group(self):
         self.edgeManager.generate_edge_masking_data_all_group_2()
         return self.edgeManager.edge_masking_data_all_group
+
+    def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group):
+        self.cloudServer.aggregation_edge_masking_data_all_group(edge_masking_data_all_group)
+        return self.cloudServer.anonymous_all_client_data
+
+    def cloud_server_TD(self, anonymous_all_client_data):
+        self.cloudServer.td_in_anonymous_data(anonymous_all_client_data)
+        return self.cloudServer.td_result
+
+    @staticmethod
+    def original_data_TD(original_data):
+        td_CRH = TD_CRH(original_data, params.K, params.M)
+        td_CRH.TD(params.count)
+        print(td_CRH.xm_i[params.count])

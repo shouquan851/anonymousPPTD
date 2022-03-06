@@ -63,7 +63,6 @@ class Encrypt:
         dt = decryptor.update(ciphertext) + decryptor.finalize()
         return func.bytes_to_list(dt)
 
-
 # if __name__ == '__main__':
 #     print('PyCharm')
 # encrypt = Encrypt()
