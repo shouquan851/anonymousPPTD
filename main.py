@@ -20,8 +20,8 @@ edge_masking_data_all_group = application.edge_generate_edge_masking_data_all_gr
 # 云中心聚合数据
 anonymous_all_client_data = application.cloud_server_aggregation_edge_masking_data(edge_masking_data_all_group)
 # 云中心执行TD
-td_result = application.cloud_server_TD(anonymous_all_client_data)
-print(td_result)
-
+td_result_anonymous_all_client_data = application.cloud_server_TD(anonymous_all_client_data)
+print(td_result_anonymous_all_client_data)
 # 对原始数据做TD,和匿名后云中心做TD进行比较
-Application.original_data_TD(application.dataGenerator.all_client_data)
+td_result_original_data = Application.original_data_TD(application.dataGenerator.all_client_data)
+print(td_result_original_data)

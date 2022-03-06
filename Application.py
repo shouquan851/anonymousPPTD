@@ -107,4 +107,4 @@ class Application:
     def original_data_TD(original_data):
         td_CRH = TD_CRH(original_data, params.K, params.M)
         td_CRH.TD(params.count)
-        print(td_CRH.xm_i[params.count])
+        return td_CRH.xm_i[params.count]
