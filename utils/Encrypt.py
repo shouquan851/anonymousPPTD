@@ -1,3 +1,4 @@
+import hashlib
 import os
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -5,6 +6,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import dh
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from gmssl import func
+from Crypto.Hash import SHA256
 
 import params
 
@@ -63,6 +65,21 @@ class Encrypt:
         dt = decryptor.update(ciphertext) + decryptor.finalize()
         return func.bytes_to_list(dt)
 
+    @staticmethod
+    def hashCode(s):
+        seed = 31
+        h = 0
+        for c in s:
+            h = int(seed * h) + ord(c)
+        return h
+
+    @staticmethod
+    def hash_random(input: int):
+        hex = hashlib.sha1(bytes(input)).hexdigest()[0:5]
+        temp = Encrypt.hashCode(hex)
+        return temp
+
+
 # if __name__ == '__main__':
 #     print('PyCharm')
 # encrypt = Encrypt()
@@ -84,3 +101,6 @@ class Encrypt:
 # print(func.bytes_to_list(ct))
 # dt = Encrypt.aes_list_decryptor(key1, ct)
 # print(dt)
+
+print(Encrypt.hash_random(10))
+# print(Encrypt.hash_random(i))

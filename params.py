@@ -1,6 +1,6 @@
-edge_number = 5
+edge_number = 4
 client_number = 50
-group_number_list = [10, 10, 10, 10, 10]
+group_number_list = [10, 10, 10, 20]
 
 # datagenerate
 # 可靠程度,越接近100 越可靠
@@ -21,4 +21,7 @@ g = 2
 
 # noise
 client_noise = 0
+edge_masking_noise = 0
 edge_noise = 0
+ru_start = 0
+ru_end= 1000

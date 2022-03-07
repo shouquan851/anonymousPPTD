@@ -1,3 +1,5 @@
+import copy
+
 import params
 from utils.Encrypt import Encrypt
 from utils.TD_CRH import TD_CRH
@@ -9,6 +11,8 @@ class CloudServer:
     aes_key_list_with_client = None
     anonymous_all_client_data = list()
     td_result = list()
+    hash_noise_all_group = list()
+    hash_noise_others_group = list()
 
     def __init__(self):
         print("init CloudServer")
@@ -25,6 +29,46 @@ class CloudServer:
                 encrypt.generate_aes_key(self.private_server_key, self.public_server_key, public_key_client))
         self.aes_key_list_with_client = aes_key_list_with_client
 
+    def generate_hash_noise_all_group(self, de_all_group_client_random_index, client_ru_all_group):
+        '''
+        云中心生成hash噪声
+        :param de_all_group_client_random_index:
+        :param client_ru_all_group:
+        :return:
+        '''
+        index_list = list()
+        for temp_list in de_all_group_client_random_index:
+            index_list += temp_list
+        for m in range(params.M):
+            hash_noise_one_task = list()
+            # 初始化向量
+            for k in range(params.client_number):
+                hash_noise_one_task.append(0)
+            # 计算用户产生的随机数后生成的hash噪声
+            for k in range(params.client_number):
+                for edge_index in range(params.edge_number):
+                    for client_index_in_group in range(params.group_number_list[edge_index]):
+                        # temp = ru + k + m
+                        temp = client_ru_all_group[edge_index][client_index_in_group] + index_list[k] + m
+                        hash_noise_one_task[k] += Encrypt.hash_random(temp)
+            self.hash_noise_all_group.append(hash_noise_one_task)
+
+        # 计算要发送给边缘节点的数据
+        self.hash_noise_others_group = copy.deepcopy(self.hash_noise_all_group)
+        for m in range(params.M):
+            # 逐个组处理
+            start_index = 0
+            end_index = 0
+            for k in range(params.edge_number):
+                for edge_index in range(params.edge_number):
+                    end_index += params.group_number_list[edge_index]
+                    # 减去本组节点的噪声
+                    if start_index <= k < end_index:
+                        for client_index_in_group in range(params.group_number_list[edge_index]):
+                            temp = client_ru_all_group[edge_index][client_index_in_group] + index_list[k] + m
+                            self.hash_noise_others_group[m][k] -= Encrypt.hash_random(temp)
+                    start_index = end_index
+
     def aggregation_edge_masking_data_all_group(self, edge_masking_data_all_group):
         '''
         中心服务器聚合用户数据
@@ -37,6 +81,7 @@ class CloudServer:
                 temp = 0
                 for edge_index in range(params.edge_number):
                     temp += edge_masking_data_all_group[edge_index][m][k]
+                temp -= self.hash_noise_all_group[m][k]
                 anonymous_one_client_data.append(temp)
             self.anonymous_all_client_data.append(anonymous_one_client_data)
 
