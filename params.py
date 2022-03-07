@@ -20,8 +20,11 @@ q = None
 g = 2
 
 # noise
+select_index = 2
 client_noise = 0
 edge_masking_noise = 0
 edge_noise = 0
 ru_start = 0
 ru_end= 1000
+masking_p = 100000
+prf_p = 10000

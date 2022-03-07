@@ -20,7 +20,7 @@ class EdgeManager:
         print("init EdgeManager")
 
     def generate_dh_key(self, edge_count):
-        encrypt = Encrypt()
+        encrypt = Encrypt(params.p,params.g)
         public_key_list = list()
         private_key_list = list()
         for i in range(edge_count):
@@ -31,7 +31,7 @@ class EdgeManager:
         self.private_key_edge_list = private_key_list
 
     def generate_aes_key(self):
-        encrypt = Encrypt()
+        encrypt = Encrypt(params.p,params.g)
         # 为所有边缘节点和其他所有边缘节点协商对称密钥
         aes_key_list_all_edge = list()
         for edge_index in range(len(self.private_key_edge_list)):

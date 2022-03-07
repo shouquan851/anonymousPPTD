@@ -16,7 +16,7 @@ class ClientManager:
         print("init ClientManager")
 
     def generate_dh_key(self, client_count):
-        encrypt = Encrypt()
+        encrypt = Encrypt(params.p,params.g)
         public_key_list = list()
         private_key_list = list()
         for i in range(client_count):
@@ -27,7 +27,7 @@ class ClientManager:
         self.private_key_client_list = private_key_list
 
     def generate_aes_key(self):
-        encrypt = Encrypt()
+        encrypt = Encrypt(params.p,params.g)
         # 为每个组内的所有用户和其他所有用户协商对称密钥
         count = 0  # 已处理过的组的用户数量
         group_index = 1
