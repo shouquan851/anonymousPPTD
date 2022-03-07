@@ -1,12 +1,10 @@
 import hashlib
-import os
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import dh
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from gmssl import func
-from Crypto.Hash import SHA256
 
 import params
 
@@ -74,9 +72,9 @@ class Encrypt:
         return h
 
     @staticmethod
-    def hash_random(input: int):
-        hex = hashlib.sha1(bytes(input)).hexdigest()[0:5]
-        temp = Encrypt.hashCode(hex)
+    def hash_random(plaintext: int):
+        hex_temp = hashlib.sha1(bytes(plaintext)).hexdigest()[0:5]
+        temp = Encrypt.hashCode(hex_temp)
         return temp
 
 

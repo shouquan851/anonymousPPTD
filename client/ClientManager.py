@@ -1,5 +1,4 @@
 import random
-import time
 
 import params
 from utils.Encrypt import Encrypt
@@ -52,11 +51,11 @@ class ClientManager:
         self.aes_key_list_all_group = aes_key_list_all_group
 
     def load_data(self, client_data):
-        '''
+        """
         把生成的整个系统的用户数据切分给到各个组的用户中去
         :param client_data:整个系统的用户数据
         :return:
-        '''
+        """
         count = 0
         for group_index in range(len(params.group_number_list)):
             client_data_one_group = list()
@@ -73,11 +72,11 @@ class ClientManager:
             self.client_ru_all_group.append(client_ru_one_group)
 
     def generate_hash_noise_data(self, de_all_group_client_data_index):
-        '''
+        """
         每个边缘节点中的用户,生成需要添加的hash噪声
         :param de_all_group_client_data_index:
         :return:
-        '''
+        """
         for edge_index in range(params.edge_number):
             hash_noise_one_group = list()
             for client_index in range(params.group_number_list[edge_index]):
@@ -95,11 +94,11 @@ class ClientManager:
             self.hash_noise_all_group.append(hash_noise_one_group)
 
     def generate_update_data(self, all_group_in_client_data_index):
-        '''
+        """
         根据数据添加位置,生成处理过的数据
         :param all_group_in_client_data_index:
         :return:
-        '''
+        """
         if len(self.client_data_all_group) == 0:
             print("还未加载数据")
             return

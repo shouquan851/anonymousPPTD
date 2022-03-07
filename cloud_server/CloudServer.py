@@ -1,4 +1,4 @@
-import copy
+
 
 import params
 from utils.Encrypt import Encrypt
@@ -31,12 +31,11 @@ class CloudServer:
         self.aes_key_list_with_client = aes_key_list_with_client
 
     def generate_hash_noise_all_group(self, client_ru_all_group):
-        '''
+        """
         云中心生成hash噪声
-        :param de_all_group_client_random_index:
         :param client_ru_all_group:
         :return:
-        '''
+        """
         for edge_index in range(params.edge_number):
             hash_noise_one_group = list()
             for m in range(params.M):
@@ -62,19 +61,12 @@ class CloudServer:
                 hash_noise_all_group_one_task.append(noise)
             self.hash_noise_all_group.append(hash_noise_all_group_one_task)
 
-    # def aggregate_edge_noise_index_all_group(self, edge_noise_index_all_group):
-    #     for k in range(params.client_number):
-    #         self.hash_noise_index.append(0)
-    #     for k in range(params.client_number):
-    #         for edge_index in range(params.edge_number):
-    #             self.hash_noise_index[k] += edge_noise_index_all_group[edge_index][k]
-
     def aggregation_edge_masking_data_all_group(self, edge_masking_data_all_group):
-        '''
+        """
         中心服务器聚合用户数据
         :param edge_masking_data_all_group:
         :return:
-        '''
+        """
         for k in range(params.K):
             anonymous_one_client_data = list()
             for m in range(params.M):

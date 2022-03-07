@@ -9,7 +9,7 @@ application.key_agreement()
 # 生成数据
 application.data_generator()
 # 生成数据上传位置
-all_group_in_client_data_index = application.generate_data_index(2, 3)
+all_group_in_client_data_index = application.generate_data_index(2)
 de_all_group_client_data_index = application.edgeManager.de_all_group_client_data_index
 
 # 客户端上传数据

@@ -65,13 +65,12 @@ class Application:
             for client_data_one in client_data_one_group:
                 print(client_data_one)
 
-    def generate_data_index(self, edge_en_data_index, edge_en_random_index):
-        '''
+    def generate_data_index(self, edge_en_data_index):
+        """
         边缘节点协商数据添加位置
         :param edge_en_data_index: 云中心选的数据上传位置的边缘服务器
-        :param edge_en_random_index: 云中心选的噪声添加位置的边缘服务器
         :return:
-        '''
+        """
         self.edgeManager.generate_en_client_data_index()
         self.edgeManager.generate_de_group_client_data_index(edge_en_data_index,
                                                              self.edgeManager.en_all_edge_client_data_index[
@@ -79,9 +78,6 @@ class Application:
         # 边缘节点总体数据添加位置
         print("边缘节点总体数据添加位置")
         print(self.edgeManager.de_all_group_client_data_index)
-        # 边缘节点总体各用户噪声添加位置
-        # print("边缘节点总体各用户噪声添加位置")
-        # print(self.edgeManager.de_all_group_client_random_index)
         # 各个边缘节点生成组内用户数据添加位置
         self.edgeManager.generate_in_group_client_data_index()
         print("各边缘节点内部用户数据添加位置")
@@ -109,11 +105,10 @@ class Application:
         return self.cloudServer.hash_noise_others_group
 
     def edge_generate_edge_masking_data_all_group(self, hash_noise_others_group):
-        self.edgeManager.generate_edge_masking_data_all_group_2(hash_noise_others_group)
+        self.edgeManager.generate_edge_masking_data_all_group(hash_noise_others_group)
         return self.edgeManager.edge_masking_data_all_group
 
     def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group):
-        # self.cloudServer.aggregate_edge_noise_index_all_group(edge_noise_index_all_group)
         self.cloudServer.aggregation_edge_masking_data_all_group(edge_masking_data_all_group)
         return self.cloudServer.anonymous_all_client_data
 
