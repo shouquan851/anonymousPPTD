@@ -15,6 +15,7 @@ class EdgeManager:
     all_group_in_client_data_index = list()
     all_group_aggreagtion_client_data = list()
     edge_masking_data_all_group = list()
+    edge_noise_index_all_group = list()
 
     def __init__(self):
         print("init EdgeManager")
@@ -169,9 +170,24 @@ class EdgeManager:
                 for client_data_index in self.de_all_group_client_data_index[edge_index]:
                     edge_masking_data_one_group[m][client_data_index] += \
                         self.all_group_aggreagtion_client_data[edge_index][m][count]
-                    edge_masking_data_one_group[m][client_data_index] += hash_noise_others_group[m][count]
+                    edge_masking_data_one_group[m][client_data_index] += hash_noise_others_group[edge_index][m][
+                        self.de_all_group_client_random_index[edge_index][count]]
                     count += 1
             self.edge_masking_data_all_group.append(edge_masking_data_one_group)
+
+    def generate_edge_noise_index_all_group(self):
+        '''
+        生成噪声位置masking后的结果
+        :return:
+        '''
+        for edge_index in range(params.edge_number):
+            edge_noise_index_one_group = list()
+            for k in range(params.client_number):
+                edge_noise_index_one_group.append(params.edge_masking_noise)
+            for i in range(len(self.de_all_group_client_data_index[edge_index])):
+                data_index = self.de_all_group_client_data_index[edge_index][i]
+                edge_noise_index_one_group[data_index] = self.de_all_group_client_random_index[edge_index][i]
+            self.edge_noise_index_all_group.append(edge_noise_index_one_group)
 
 
 if __name__ == '__main__':

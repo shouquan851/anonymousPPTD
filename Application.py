@@ -88,6 +88,7 @@ class Application:
         self.edgeManager.generate_in_group_client_data_index()
         print("各边缘节点内部用户数据添加位置")
         print(self.edgeManager.all_group_in_client_data_index)
+        self.edgeManager.generate_edge_noise_index_all_group()
         return self.edgeManager.all_group_in_client_data_index
 
     def client_generate_ru(self):
@@ -106,15 +107,16 @@ class Application:
         self.edgeManager.aggregation_all_group_client_data(client_masking_data_all_group)
         return self.edgeManager.all_group_aggreagtion_client_data
 
-    def cloud_server_generate_hash_noise(self, de_all_group_client_random_index, client_ru_all_group):
-        self.cloudServer.generate_hash_noise_all_group(de_all_group_client_random_index, client_ru_all_group)
+    def cloud_server_generate_hash_noise(self, client_ru_all_group):
+        self.cloudServer.generate_hash_noise_all_group(client_ru_all_group)
         return self.cloudServer.hash_noise_others_group
 
-    def edge_generate_edge_masking_data_all_group(self,hash_noise_others_group):
+    def edge_generate_edge_masking_data_all_group(self, hash_noise_others_group):
         self.edgeManager.generate_edge_masking_data_all_group_2(hash_noise_others_group)
         return self.edgeManager.edge_masking_data_all_group
 
-    def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group):
+    def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group, edge_noise_index_all_group):
+        self.cloudServer.aggregate_edge_noise_index_all_group(edge_noise_index_all_group)
         self.cloudServer.aggregation_edge_masking_data_all_group(edge_masking_data_all_group)
         return self.cloudServer.anonymous_all_client_data
 

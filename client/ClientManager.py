@@ -86,18 +86,18 @@ class ClientManager:
                     hash_noise_one_client_one_task = list()
                     for k in range(params.group_number_list[edge_index]):
                         # 生成随机数 用户的ru,加上边缘节点告诉的需要添加hash的位置,以及任务m
-                        temp = self.client_ru_all_group[edge_index][k] + de_all_group_client_random_index[edge_index][
-                            k] + m
+                        temp = self.client_ru_all_group[edge_index][client_index] + \
+                               de_all_group_client_random_index[edge_index][k] + m
                         # 随机数hash
                         hash_noise_one_client_one_task.append(Encrypt.hash_random(temp))
                     hash_noise_one_client.append(hash_noise_one_client_one_task)
                 hash_noise_one_group.append(hash_noise_one_client)
             self.hash_noise_all_group.append(hash_noise_one_group)
 
-    def generate_update_data(self, add_noise_index_all_group):
+    def generate_update_data(self, all_group_in_client_data_index):
         '''
         根据数据添加位置,生成处理过的数据
-        :param add_noise_index_all_group:
+        :param all_group_in_client_data_index:
         :return:
         '''
         if len(self.client_data_all_group) == 0:
@@ -116,7 +116,7 @@ class ClientManager:
                     # 逐个处理每个任务的数据
                     for data_index in range(len(self.client_data_all_group[group_index])):
                         # 当前位置是用户添加数据的位置,就添加数据,否则就只添加噪声  暂时的噪声用的是100000000,回头得使用masking机制去添加
-                        if data_index != add_noise_index_all_group[group_index][client_index]:
+                        if data_index != all_group_in_client_data_index[group_index][client_index]:
                             noise = self.hash_noise_all_group[group_index][client_index][m][data_index]
                             client_masking_data_one_task.append(noise)
                         else:

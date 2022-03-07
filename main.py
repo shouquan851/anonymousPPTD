@@ -21,14 +21,15 @@ client_masking_data_all_group = application.client_upload_data(all_group_in_clie
 application.edge_aggregation_client_data(client_masking_data_all_group)
 
 # 云中心生成hash噪声
-hash_noise_others_group = application.cloud_server_generate_hash_noise(de_all_group_client_random_index,
-                                                                       client_ru_all_group)
+hash_noise_others_group = application.cloud_server_generate_hash_noise(client_ru_all_group)
 
 # 边缘节点上传数据
 edge_masking_data_all_group = application.edge_generate_edge_masking_data_all_group(hash_noise_others_group)
 
 # 云中心聚合数据
-anonymous_all_client_data = application.cloud_server_aggregation_edge_masking_data(edge_masking_data_all_group)
+edge_noise_index_all_group = application.edgeManager.edge_noise_index_all_group
+anonymous_all_client_data = application.cloud_server_aggregation_edge_masking_data(edge_masking_data_all_group,
+                                                                                   edge_noise_index_all_group)
 # 云中心执行TD
 td_result_anonymous_all_client_data = application.cloud_server_TD(anonymous_all_client_data)
 print(td_result_anonymous_all_client_data)
