@@ -72,10 +72,10 @@ class ClientManager:
                 client_ru_one_group.append(random.randrange(params.ru_start, params.ru_end))
             self.client_ru_all_group.append(client_ru_one_group)
 
-    def generate_hash_noise_data(self, de_all_group_client_random_index):
+    def generate_hash_noise_data(self, de_all_group_client_data_index):
         '''
         每个边缘节点中的用户,生成需要添加的hash噪声
-        :param de_all_group_client_random_index:
+        :param de_all_group_client_data_index:
         :return:
         '''
         for edge_index in range(params.edge_number):
@@ -87,7 +87,7 @@ class ClientManager:
                     for k in range(params.group_number_list[edge_index]):
                         # 生成随机数 用户的ru,加上边缘节点告诉的需要添加hash的位置,以及任务m
                         temp = self.client_ru_all_group[edge_index][client_index] + \
-                               de_all_group_client_random_index[edge_index][k] + m
+                               de_all_group_client_data_index[edge_index][k] + m
                         # 随机数hash
                         hash_noise_one_client_one_task.append(Encrypt.hash_random(temp))
                     hash_noise_one_client.append(hash_noise_one_client_one_task)

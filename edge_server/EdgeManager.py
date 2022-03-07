@@ -11,11 +11,11 @@ class EdgeManager:
     aes_key_list_all_edge = list()
     en_all_edge_client_data_index = list()
     de_all_group_client_data_index = list()
-    de_all_group_client_random_index = list()
+    # de_all_group_client_random_index = list()
     all_group_in_client_data_index = list()
     all_group_aggreagtion_client_data = list()
     edge_masking_data_all_group = list()
-    edge_noise_index_all_group = list()
+    # edge_noise_index_all_group = list()
 
     def __init__(self):
         print("init EdgeManager")
@@ -72,8 +72,7 @@ class EdgeManager:
                 start_index = end_index
             self.en_all_edge_client_data_index.append(en_one_edge_client_data_index)
 
-    def generate_de_group_client_data_index(self, edge_en_data_index, edge_en_random_index, en_data_list,
-                                            en_random_list):
+    def generate_de_group_client_data_index(self, edge_en_data_index, en_data_list):
         '''
         节点解密收到的加密数据位置
         :param edge_en_data_index: 加密数据上传位置向量的节点的索引
@@ -89,9 +88,9 @@ class EdgeManager:
             temp_list = copy.copy(en_data_list[start_index:end_index])
             self.de_all_group_client_data_index.append(
                 Encrypt.aes_list_decryptor(self.aes_key_list_all_edge[edge_index][edge_en_data_index], temp_list))
-            temp_list = copy.copy(en_random_list[start_index:end_index])
-            self.de_all_group_client_random_index.append(
-                Encrypt.aes_list_decryptor(self.aes_key_list_all_edge[edge_index][edge_en_random_index], temp_list))
+            # temp_list = copy.copy(en_random_list[start_index:end_index])
+            # self.de_all_group_client_random_index.append(
+            #     Encrypt.aes_list_decryptor(self.aes_key_list_all_edge[edge_index][edge_en_random_index], temp_list))
             start_index = end_index
 
     def generate_in_group_client_data_index(self):
@@ -126,30 +125,30 @@ class EdgeManager:
                 one_group_aggreagtion_client_data.append(one_task_group_aggregation_client_data)
             self.all_group_aggreagtion_client_data.append(one_group_aggreagtion_client_data)
 
-    def generate_edge_masking_data_all_group(self):
-        '''
-        边缘节点生成要上传给服务器的数据,此处噪声先用00000000代替
-        :return:
-        '''
-        for edge_index in range(params.edge_number):
-            edge_masking_data_one_group = list()
-            # 边缘节点初始化要上传的数据矩阵
-            for m in range(params.M):
-                edge_masking_data_one_task_one_group = list()
-                for k in range(params.client_number):
-                    edge_masking_data_one_task_one_group.append(0)
-                edge_masking_data_one_group.append(edge_masking_data_one_task_one_group)
-            # 边缘节点将数据添加到初始化后的数据矩阵
-            for m in range(params.M):
-                temp_list = copy.copy(self.de_all_group_client_data_index[edge_index])
-                for k in range(params.client_number):
-                    if k in temp_list:
-                        index = temp_list.index(k)
-                        edge_masking_data_one_group[m][k] += self.all_group_aggreagtion_client_data[edge_index][m][
-                            index]
-                    else:
-                        edge_masking_data_one_group[m][k] += params.edge_noise
-            self.edge_masking_data_all_group.append(edge_masking_data_one_group)
+    # def generate_edge_masking_data_all_group(self):
+    #     '''
+    #     边缘节点生成要上传给服务器的数据,此处噪声先用00000000代替
+    #     :return:
+    #     '''
+    #     for edge_index in range(params.edge_number):
+    #         edge_masking_data_one_group = list()
+    #         # 边缘节点初始化要上传的数据矩阵
+    #         for m in range(params.M):
+    #             edge_masking_data_one_task_one_group = list()
+    #             for k in range(params.client_number):
+    #                 edge_masking_data_one_task_one_group.append(0)
+    #             edge_masking_data_one_group.append(edge_masking_data_one_task_one_group)
+    #         # 边缘节点将数据添加到初始化后的数据矩阵
+    #         for m in range(params.M):
+    #             temp_list = copy.copy(self.de_all_group_client_data_index[edge_index])
+    #             for k in range(params.client_number):
+    #                 if k in temp_list:
+    #                     index = temp_list.index(k)
+    #                     edge_masking_data_one_group[m][k] += self.all_group_aggreagtion_client_data[edge_index][m][
+    #                         index]
+    #                 else:
+    #                     edge_masking_data_one_group[m][k] += params.edge_noise
+    #         self.edge_masking_data_all_group.append(edge_masking_data_one_group)
 
     def generate_edge_masking_data_all_group_2(self, hash_noise_others_group):
         '''
@@ -171,31 +170,23 @@ class EdgeManager:
                     edge_masking_data_one_group[m][client_data_index] += \
                         self.all_group_aggreagtion_client_data[edge_index][m][count]
                     edge_masking_data_one_group[m][client_data_index] += hash_noise_others_group[edge_index][m][
-                        self.de_all_group_client_random_index[edge_index][count]]
+                        self.de_all_group_client_data_index[edge_index][count]]
                     count += 1
             self.edge_masking_data_all_group.append(edge_masking_data_one_group)
 
-    def generate_edge_noise_index_all_group(self):
-        '''
-        生成噪声位置masking后的结果
-        :return:
-        '''
-        for edge_index in range(params.edge_number):
-            edge_noise_index_one_group = list()
-            for k in range(params.client_number):
-                edge_noise_index_one_group.append(params.edge_masking_noise)
-            for i in range(len(self.de_all_group_client_data_index[edge_index])):
-                data_index = self.de_all_group_client_data_index[edge_index][i]
-                edge_noise_index_one_group[data_index] = self.de_all_group_client_random_index[edge_index][i]
-            self.edge_noise_index_all_group.append(edge_noise_index_one_group)
+    # def generate_edge_noise_index_all_group(self):
+    #     '''
+    #     生成噪声位置masking后的结果
+    #     :return:
+    #     '''
+    #     for edge_index in range(params.edge_number):
+    #         edge_noise_index_one_group = list()
+    #         for k in range(params.client_number):
+    #             edge_noise_index_one_group.append(params.edge_masking_noise)
+    #         for i in range(len(self.de_all_group_client_data_index[edge_index])):
+    #             data_index = self.de_all_group_client_data_index[edge_index][i]
+    #             edge_noise_index_one_group[data_index] = self.de_all_group_client_data_index[edge_index][i]
+    #         self.edge_noise_index_all_group.append(edge_noise_index_one_group)
 
 
-if __name__ == '__main__':
-    # 测试一下协商数据添加位置的方式
-    edgeManager = EdgeManager()
-    edgeManager.generate_dh_key(params.edge_number)
-    edgeManager.generate_aes_key()
-    edgeManager.generate_en_client_data_index()
-    print(edgeManager.en_all_edge_client_data_index)
-    edgeManager.generate_de_group_client_data_index(7, 2, edgeManager.en_all_edge_client_data_index[7])
-    print(edgeManager.de_all_group_client_data_index)
+# if __name__ == '__main__':

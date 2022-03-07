@@ -62,12 +62,12 @@ class CloudServer:
                 hash_noise_all_group_one_task.append(noise)
             self.hash_noise_all_group.append(hash_noise_all_group_one_task)
 
-    def aggregate_edge_noise_index_all_group(self, edge_noise_index_all_group):
-        for k in range(params.client_number):
-            self.hash_noise_index.append(0)
-        for k in range(params.client_number):
-            for edge_index in range(params.edge_number):
-                self.hash_noise_index[k] += edge_noise_index_all_group[edge_index][k]
+    # def aggregate_edge_noise_index_all_group(self, edge_noise_index_all_group):
+    #     for k in range(params.client_number):
+    #         self.hash_noise_index.append(0)
+    #     for k in range(params.client_number):
+    #         for edge_index in range(params.edge_number):
+    #             self.hash_noise_index[k] += edge_noise_index_all_group[edge_index][k]
 
     def aggregation_edge_masking_data_all_group(self, edge_masking_data_all_group):
         '''
@@ -81,10 +81,9 @@ class CloudServer:
                 temp = 0
                 for edge_index in range(params.edge_number):
                     temp += edge_masking_data_all_group[edge_index][m][k]
-                temp -= self.hash_noise_all_group[m][self.hash_noise_index[k]]
+                temp -= self.hash_noise_all_group[m][k]
                 anonymous_one_client_data.append(temp)
             self.anonymous_all_client_data.append(anonymous_one_client_data)
-
 
     def td_in_anonymous_data(self, anonymous_all_client_data):
         td_CRH = TD_CRH(anonymous_all_client_data, params.K, params.M)

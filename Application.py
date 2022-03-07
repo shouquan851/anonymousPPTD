@@ -73,22 +73,19 @@ class Application:
         :return:
         '''
         self.edgeManager.generate_en_client_data_index()
-        self.edgeManager.generate_de_group_client_data_index(edge_en_data_index, edge_en_random_index,
+        self.edgeManager.generate_de_group_client_data_index(edge_en_data_index,
                                                              self.edgeManager.en_all_edge_client_data_index[
-                                                                 edge_en_data_index],
-                                                             self.edgeManager.en_all_edge_client_data_index[
-                                                                 edge_en_random_index])
+                                                                 edge_en_data_index])
         # 边缘节点总体数据添加位置
         print("边缘节点总体数据添加位置")
         print(self.edgeManager.de_all_group_client_data_index)
         # 边缘节点总体各用户噪声添加位置
-        print("边缘节点总体各用户噪声添加位置")
-        print(self.edgeManager.de_all_group_client_random_index)
+        # print("边缘节点总体各用户噪声添加位置")
+        # print(self.edgeManager.de_all_group_client_random_index)
         # 各个边缘节点生成组内用户数据添加位置
         self.edgeManager.generate_in_group_client_data_index()
         print("各边缘节点内部用户数据添加位置")
         print(self.edgeManager.all_group_in_client_data_index)
-        self.edgeManager.generate_edge_noise_index_all_group()
         return self.edgeManager.all_group_in_client_data_index
 
     def client_generate_ru(self):
@@ -96,10 +93,10 @@ class Application:
         self.clientManager.generate_ru()
         return self.clientManager.client_ru_all_group
 
-    def client_upload_data(self, all_group_in_client_data_index, de_all_group_client_random_index):
+    def client_upload_data(self, all_group_in_client_data_index, de_all_group_client_data_index):
         # 根据数据添加位置处理用户数据
         # 用户生成要添加的hash噪声
-        self.clientManager.generate_hash_noise_data(de_all_group_client_random_index)
+        self.clientManager.generate_hash_noise_data(de_all_group_client_data_index)
         # 用户生成上传数据
         return self.clientManager.generate_update_data(all_group_in_client_data_index)
 
@@ -115,8 +112,8 @@ class Application:
         self.edgeManager.generate_edge_masking_data_all_group_2(hash_noise_others_group)
         return self.edgeManager.edge_masking_data_all_group
 
-    def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group, edge_noise_index_all_group):
-        self.cloudServer.aggregate_edge_noise_index_all_group(edge_noise_index_all_group)
+    def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group):
+        # self.cloudServer.aggregate_edge_noise_index_all_group(edge_noise_index_all_group)
         self.cloudServer.aggregation_edge_masking_data_all_group(edge_masking_data_all_group)
         return self.cloudServer.anonymous_all_client_data
 
