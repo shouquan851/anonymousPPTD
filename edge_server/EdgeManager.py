@@ -14,6 +14,7 @@ class EdgeManager:
     all_group_in_client_data_index = list()
     all_group_aggreagtion_client_data = list()
     edge_masking_data_all_group = list()
+    all_group_masking_client_random_index = list()
 
     def __init__(self):
         print("init EdgeManager")
@@ -86,6 +87,21 @@ class EdgeManager:
                 Encrypt.aes_list_decryptor(self.aes_key_list_all_edge[edge_index][edge_en_data_index], temp_list))
             start_index = end_index
 
+    def generate_all_group_client_random_index(self):
+        """
+        边缘节点生成关于random_index要上传的向量
+        :return:
+        """
+        for edge_index in range(params.edge_number):
+            one_group_masking_client_random_index = list()
+            for k in range(params.K):
+                one_group_masking_client_random_index.append(0)
+            count = 0
+            for random_index in self.de_all_group_client_data_index[edge_index]:
+                one_group_masking_client_random_index[random_index] = count + params.edge_masking_noise
+                count += 1
+            self.all_group_masking_client_random_index.append(one_group_masking_client_random_index)
+
     def generate_in_group_client_data_index(self):
         """
         各个边缘节点为组内用户分配组内数据添加位置
@@ -120,7 +136,7 @@ class EdgeManager:
 
     def generate_edge_masking_data_all_group(self, hash_noise_others_group):
         """
-        边缘节点生成要上传给服务器的数据,此处噪声先用00000000代替
+        边缘节点生成要上传给服务器的数据,此处的masking噪声先用00000000代替
         :return:
         """
         for edge_index in range(params.edge_number):
@@ -131,13 +147,17 @@ class EdgeManager:
                 for k in range(params.client_number):
                     edge_masking_data_one_task_one_group.append(params.edge_masking_noise)
                 edge_masking_data_one_group.append(edge_masking_data_one_task_one_group)
-            # 边缘节点将数据添加到初始化后的数据矩阵
+            # 边缘节点将数据和哈希噪声添加到初始化后的数据矩阵
             for m in range(params.M):
                 count = 0
                 for client_data_index in self.de_all_group_client_data_index[edge_index]:
+                    # 边缘节点添加数据
                     edge_masking_data_one_group[m][client_data_index] += \
                         self.all_group_aggreagtion_client_data[edge_index][m][count]
-                    edge_masking_data_one_group[m][client_data_index] += hash_noise_others_group[edge_index][m][
-                        self.de_all_group_client_data_index[edge_index][count]]
+                    # # 边缘节点添加哈希噪声 用户知道匿名集
+                    # edge_masking_data_one_group[m][client_data_index] += hash_noise_others_group[edge_index][m][
+                    #     self.de_all_group_client_data_index[edge_index][count]]
+                    # 边缘节点添加哈希噪声 用户不知道匿名集
+                    edge_masking_data_one_group[m][client_data_index] += hash_noise_others_group[edge_index][m][count]
                     count += 1
             self.edge_masking_data_all_group.append(edge_masking_data_one_group)

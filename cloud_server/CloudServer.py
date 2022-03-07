@@ -1,5 +1,3 @@
-
-
 import params
 from utils.Encrypt import Encrypt
 from utils.TD_CRH import TD_CRH
@@ -61,6 +59,18 @@ class CloudServer:
                 hash_noise_all_group_one_task.append(noise)
             self.hash_noise_all_group.append(hash_noise_all_group_one_task)
 
+    def aggregation_all_group_client_random_index(self, all_group_masking_client_random_index):
+        """
+        聚合hash_noise_index
+        :param all_group_masking_client_random_index:
+        :return:
+        """
+        for k in range(params.K):
+            self.hash_noise_index.append(0)
+        for k in range(params.K):
+            for edge_index in range(params.edge_number):
+                self.hash_noise_index[k] += all_group_masking_client_random_index[edge_index][k]
+
     def aggregation_edge_masking_data_all_group(self, edge_masking_data_all_group):
         """
         中心服务器聚合用户数据
@@ -73,7 +83,7 @@ class CloudServer:
                 temp = 0
                 for edge_index in range(params.edge_number):
                     temp += edge_masking_data_all_group[edge_index][m][k]
-                temp -= self.hash_noise_all_group[m][k]
+                temp -= self.hash_noise_all_group[m][self.hash_noise_index[k]]
                 anonymous_one_client_data.append(temp)
             self.anonymous_all_client_data.append(anonymous_one_client_data)
 

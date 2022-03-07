@@ -97,6 +97,7 @@ class Application:
         return self.clientManager.generate_update_data(all_group_in_client_data_index)
 
     def edge_aggregation_client_data(self, client_masking_data_all_group):
+        self.edgeManager.generate_all_group_client_random_index()
         self.edgeManager.aggregation_all_group_client_data(client_masking_data_all_group)
         return self.edgeManager.all_group_aggreagtion_client_data
 
@@ -109,6 +110,7 @@ class Application:
         return self.edgeManager.edge_masking_data_all_group
 
     def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group):
+        self.cloudServer.aggregation_all_group_client_random_index(self.edgeManager.all_group_masking_client_random_index)
         self.cloudServer.aggregation_edge_masking_data_all_group(edge_masking_data_all_group)
         return self.cloudServer.anonymous_all_client_data
 

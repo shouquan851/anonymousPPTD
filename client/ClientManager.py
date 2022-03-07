@@ -84,9 +84,11 @@ class ClientManager:
                 for m in range(params.M):
                     hash_noise_one_client_one_task = list()
                     for k in range(params.group_number_list[edge_index]):
-                        # 生成随机数 用户的ru,加上边缘节点告诉的需要添加hash的位置,以及任务m
-                        temp = self.client_ru_all_group[edge_index][client_index] + \
-                               de_all_group_client_data_index[edge_index][k] + m
+                        # 生成随机数 用户的ru,加上边缘节点告诉的需要添加hash的位置,以及任务m 用户知道匿名集
+                        # temp = self.client_ru_all_group[edge_index][client_index] + \
+                        #        de_all_group_client_data_index[edge_index][k] + m
+                        # 生成随机数 用户的ru,加上边缘节点告诉的需要添加hash的位置,以及任务m 用户不知道匿名集
+                        temp = self.client_ru_all_group[edge_index][client_index] + k + m
                         # 随机数hash
                         hash_noise_one_client_one_task.append(Encrypt.hash_random(temp))
                     hash_noise_one_client.append(hash_noise_one_client_one_task)
