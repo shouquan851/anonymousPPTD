@@ -87,7 +87,7 @@ class EdgeManager:
                 Encrypt.aes_list_decryptor(self.aes_key_list_all_edge[edge_index][edge_en_data_index], temp_list))
             start_index = end_index
 
-    def generate_all_group_client_random_index(self):
+    def generate_all_group_masking_client_random_index(self):
         """
         边缘节点生成关于random_index要上传的向量
         :return:

@@ -59,7 +59,7 @@ class CloudServer:
                 hash_noise_all_group_one_task.append(noise)
             self.hash_noise_all_group.append(hash_noise_all_group_one_task)
 
-    def aggregation_all_group_client_random_index(self, all_group_masking_client_random_index):
+    def aggregation_all_group_masking_client_random_index(self, all_group_masking_client_random_index):
         """
         聚合hash_noise_index
         :param all_group_masking_client_random_index:

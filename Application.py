@@ -82,6 +82,8 @@ class Application:
         self.edgeManager.generate_in_group_client_data_index()
         print("各边缘节点内部用户数据添加位置")
         print(self.edgeManager.all_group_in_client_data_index)
+        # 边缘节点协商关于random_index要上传的向量
+        self.edgeManager.generate_all_group_masking_client_random_index()
         return self.edgeManager.all_group_in_client_data_index
 
     def client_generate_ru(self):
@@ -96,21 +98,20 @@ class Application:
         # 用户生成上传数据
         return self.clientManager.generate_update_data(all_group_in_client_data_index)
 
-    def edge_aggregation_client_data(self, client_masking_data_all_group):
-        self.edgeManager.generate_all_group_client_random_index()
-        self.edgeManager.aggregation_all_group_client_data(client_masking_data_all_group)
-        return self.edgeManager.all_group_aggreagtion_client_data
-
     def cloud_server_generate_hash_noise(self, client_ru_all_group):
         self.cloudServer.generate_hash_noise_all_group(client_ru_all_group)
         return self.cloudServer.hash_noise_others_group
+
+    def edge_aggregation_client_data(self, client_masking_data_all_group):
+        self.edgeManager.aggregation_all_group_client_data(client_masking_data_all_group)
+        return self.edgeManager.all_group_aggreagtion_client_data
 
     def edge_generate_edge_masking_data_all_group(self, hash_noise_others_group):
         self.edgeManager.generate_edge_masking_data_all_group(hash_noise_others_group)
         return self.edgeManager.edge_masking_data_all_group
 
     def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group):
-        self.cloudServer.aggregation_all_group_client_random_index(self.edgeManager.all_group_masking_client_random_index)
+        self.cloudServer.aggregation_all_group_masking_client_random_index(self.edgeManager.all_group_masking_client_random_index)
         self.cloudServer.aggregation_edge_masking_data_all_group(edge_masking_data_all_group)
         return self.cloudServer.anonymous_all_client_data
 
