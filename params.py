@@ -11,7 +11,7 @@ reliable_end = 99
 
 # TD
 K = client_number
-M = 3
+M = 10
 count = 10
 
 # DH

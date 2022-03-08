@@ -8,7 +8,7 @@ from edge_server.EdgeManager import EdgeManager
 from utils.TD_CRH import TD_CRH
 
 
-class Application:
+class AnonymousEdgePPTD:
     clientManager = None
     edgeManager = None
     cloudServer = None
@@ -58,13 +58,13 @@ class Application:
         client_data = self.dataGenerator.generate_client_data()
         # 将用户数据加载到clientManager中
         self.clientManager.load_data(client_data)
-        index = 1
         # 打印用户数据
-        for client_data_one_group in self.clientManager.client_data_all_group:
-            print("第%d组" % index)
-            index += 1
-            for client_data_one in client_data_one_group:
-                print(client_data_one)
+        # index = 1
+        # for client_data_one_group in self.clientManager.client_data_all_group:
+        #     print("第%d组" % index)
+        #     index += 1
+        #     for client_data_one in client_data_one_group:
+        #         print(client_data_one)
 
     def generate_data_index(self, edge_en_data_index):
         """
@@ -113,8 +113,10 @@ class Application:
         return self.edgeManager.edge_masking_data_all_group
 
     def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group):
+        # 聚合hash噪声的位置
         self.cloudServer.aggregation_all_group_masking_client_random_index(
             self.edgeManager.all_group_masking_client_random_index)
+        # 聚合用户数据
         self.cloudServer.aggregation_edge_masking_data_all_group(edge_masking_data_all_group)
         return self.cloudServer.anonymous_all_client_data
 
