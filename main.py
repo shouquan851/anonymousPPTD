@@ -25,7 +25,7 @@ application.edge_aggregation_client_data(client_masking_data_all_group)
 hash_noise_others_group = application.cloud_server_generate_hash_noise(client_ru_all_group)
 
 # 边缘节点添加云中心回馈的noise后上传数据
-edge_masking_data_all_group = application.edge_generate_edge_masking_data_all_group(hash_noise_others_group)
+edge_masking_data_all_group = application.edge_generate_edge_masking_data_all_group(hash_noise_others_group, 2)
 
 # 云中心聚合数据
 anonymous_all_client_data = application.cloud_server_aggregation_edge_masking_data(edge_masking_data_all_group)

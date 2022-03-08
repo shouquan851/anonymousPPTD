@@ -26,5 +26,7 @@ edge_masking_noise = 0
 edge_noise = 0
 ru_start = 0
 ru_end= 1000
+seed_start = 0
+seed_end = 100000
 masking_p = 100000
 prf_p = 10000

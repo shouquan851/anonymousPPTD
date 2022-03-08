@@ -28,10 +28,10 @@ class Application:
         self.clientManager.generate_dh_key(int(params.client_number))
         end = time.perf_counter()
         print("为所有用户生成DH密钥用时%d" % (end - start))
-        start = time.perf_counter()
-        self.clientManager.generate_aes_key()
-        end = time.perf_counter()
-        print("为所有用户协商对称密钥用时%d" % (end - start))
+        # start = time.perf_counter()
+        # self.clientManager.generate_aes_key()
+        # end = time.perf_counter()
+        # print("为所有用户协商对称密钥用时%d" % (end - start))
         # 边缘节点生成dh密钥，并相互生成aes密钥
         start = time.perf_counter()
         self.edgeManager.generate_dh_key(int(params.edge_number))
@@ -41,6 +41,7 @@ class Application:
         self.edgeManager.generate_aes_key()
         end = time.perf_counter()
         print("为所有边缘节点生成协商对称密钥用时%d" % (end - start))
+        self.edgeManager.generate_masking_seed()
         # 云中心生成dh密钥，并和用户相互生成aes密钥
         self.cloudServer.generate_dh_key()
         start = time.perf_counter()
@@ -106,12 +107,14 @@ class Application:
         self.edgeManager.aggregation_all_group_client_data(client_masking_data_all_group)
         return self.edgeManager.all_group_aggreagtion_client_data
 
-    def edge_generate_edge_masking_data_all_group(self, hash_noise_others_group):
+    def edge_generate_edge_masking_data_all_group(self, hash_noise_others_group, count):
+        self.edgeManager.generate_edge_masking_noise_all_group(count)
         self.edgeManager.generate_edge_masking_data_all_group(hash_noise_others_group)
         return self.edgeManager.edge_masking_data_all_group
 
     def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group):
-        self.cloudServer.aggregation_all_group_masking_client_random_index(self.edgeManager.all_group_masking_client_random_index)
+        self.cloudServer.aggregation_all_group_masking_client_random_index(
+            self.edgeManager.all_group_masking_client_random_index)
         self.cloudServer.aggregation_edge_masking_data_all_group(edge_masking_data_all_group)
         return self.cloudServer.anonymous_all_client_data
 

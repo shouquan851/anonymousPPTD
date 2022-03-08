@@ -7,6 +7,8 @@ from cryptography.hazmat.primitives.asymmetric import dh
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from gmssl import func
 
+import params
+
 
 class Encrypt:
     parameters = None
@@ -79,11 +81,11 @@ class Encrypt:
         return temp
 
     @staticmethod
-    def random_prf(seed, p):
+    def random_prf(seed):
         # hex_temp = hashlib.sha1(bytes(seed)).hexdigest()
         hex_temp = hashlib.sha1(seed.to_bytes(4, byteorder='big')).hexdigest()
         temp = Encrypt.hashCode(hex_temp)
-        return temp % p
+        return temp % params.prf_p
 
 
 # if __name__ == '__main__':

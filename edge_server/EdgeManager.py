@@ -3,6 +3,7 @@ import random
 
 import params
 from utils.Encrypt import Encrypt
+from utils.Masking import Masking
 
 
 class EdgeManager:
@@ -15,12 +16,16 @@ class EdgeManager:
     all_group_aggreagtion_client_data = list()
     edge_masking_data_all_group = list()
     all_group_masking_client_random_index = list()
+    masking = None
+    edge_seed_all = list()
+    masking_noise_all_edge = list()
 
     def __init__(self):
+        self.masking = Masking(params.edge_number, params.M, params.K, params.masking_p)
         print("init EdgeManager")
 
     def generate_dh_key(self, edge_count):
-        encrypt = Encrypt(params.p,params.g)
+        encrypt = Encrypt(params.p, params.g)
         public_key_list = list()
         private_key_list = list()
         for i in range(edge_count):
@@ -31,7 +36,7 @@ class EdgeManager:
         self.private_key_edge_list = private_key_list
 
     def generate_aes_key(self):
-        encrypt = Encrypt(params.p,params.g)
+        encrypt = Encrypt(params.p, params.g)
         # 为所有边缘节点和其他所有边缘节点协商对称密钥
         aes_key_list_all_edge = list()
         for edge_index in range(len(self.private_key_edge_list)):
@@ -45,6 +50,13 @@ class EdgeManager:
                 aes_key_list_one_edge.append(aes_key)
             aes_key_list_all_edge.append(aes_key_list_one_edge)
         self.aes_key_list_all_edge = aes_key_list_all_edge
+
+    def generate_masking_seed(self):
+        """
+        边缘节点之间相互协商masking_seed
+        :return:
+        """
+        self.edge_seed_all = self.masking.generate_seed_i_j(params.seed_start, params.seed_end)
 
     def generate_en_client_data_index(self):
         all_edge_client_data_index = list()
@@ -134,6 +146,15 @@ class EdgeManager:
                 one_group_aggreagtion_client_data.append(one_task_group_aggregation_client_data)
             self.all_group_aggreagtion_client_data.append(one_group_aggreagtion_client_data)
 
+    def generate_edge_masking_noise_all_group(self, count):
+        """
+        各边缘节点生成本次上传用的masking_noise
+        :param count:
+        :return:
+        """
+        self.masking.generate_random_all_client(count)
+        self.masking_noise_all_edge = self.masking.generate_masking_noise_all_client()
+
     def generate_edge_masking_data_all_group(self, hash_noise_others_group):
         """
         边缘节点生成要上传给服务器的数据,此处的masking噪声先用00000000代替
@@ -145,7 +166,7 @@ class EdgeManager:
             for m in range(params.M):
                 edge_masking_data_one_task_one_group = list()
                 for k in range(params.client_number):
-                    edge_masking_data_one_task_one_group.append(params.edge_masking_noise)
+                    edge_masking_data_one_task_one_group.append(self.masking_noise_all_edge[edge_index][m][k])
                 edge_masking_data_one_group.append(edge_masking_data_one_task_one_group)
             # 边缘节点将数据和哈希噪声添加到初始化后的数据矩阵
             for m in range(params.M):
