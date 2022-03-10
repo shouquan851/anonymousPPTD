@@ -1,4 +1,5 @@
 import params
+from AnonyMousePPTD.AnonyMousePPTD import AnonyMousePPTD
 from AnonymousEdgePPTD import AnonymousEdgePPTD
 
 # if __name__ == '__main__':
@@ -35,8 +36,20 @@ anonymous_all_client_data = anonymousEdgePPTD.cloud_server_aggregation_edge_mask
 
 # 云中心执行TD
 td_result_anonymous_all_client_data = anonymousEdgePPTD.cloud_server_TD(anonymous_all_client_data)
+print("真值发现结果")
 print(td_result_anonymous_all_client_data)
-
 # 对原始数据做TD,和匿名后云中心做TD进行比较
-td_result_original_data = anonymousEdgePPTD.original_data_TD(anonymousEdgePPTD.dataGenerator.all_client_data)
-print(td_result_original_data)
+# td_result_original_data = anonymousEdgePPTD.original_data_TD(anonymousEdgePPTD.dataGenerator.all_client_data)
+# print(td_result_original_data)
+
+# 执行对比方案
+print("************************************************************************")
+print("执行对比方案")
+anonyMousePPTD = AnonyMousePPTD()
+seed_list, all_data_index_list = anonyMousePPTD.DR_init()
+anonyMousePPTD.client_init(seed_list, all_data_index_list)
+all_client_masking_data = anonyMousePPTD.client_upload_data_(anonymousEdgePPTD.dataGenerator.all_client_data)
+anonymous_all_client_data = anonyMousePPTD.as_aggregation_masking_data(all_client_masking_data)
+td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
+print("真值发现结果")
+print(td_result_anonymous_all_client_data)
