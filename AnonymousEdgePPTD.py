@@ -1,3 +1,4 @@
+import random
 import time
 
 import params
@@ -47,6 +48,7 @@ class AnonymousEdgePPTD:
         start = time.perf_counter()
         self.cloudServer.generate_aes_key(self.clientManager.public_key_client_list)
         end = time.perf_counter()
+        self.clientManager.generate_aes_key_with_cloud(self.cloudServer.public_server_key)
         print("为所有用户和云中心协商对称密钥用时%d" % (end - start))
 
     def data_generator(self):
@@ -87,24 +89,40 @@ class AnonymousEdgePPTD:
         self.edgeManager.generate_all_group_masking_client_random_index()
         return self.edgeManager.all_group_in_client_data_index
 
-    def client_generate_ru(self):
-        # 用户生成ru
-        self.clientManager.generate_ru()
-        return self.clientManager.client_ru_all_group
+    # def client_generate_ru(self):
+    #     # 用户生成ru
+    #     self.clientManager.generate_ru()
+    #     return self.clientManager.client_ru_all_group
+
+    def generate_data_miss_list(self, rate):
+        data_miss_list_all_group = list()
+        for edge_index in range(params.edge_number):
+            data_miss_list_one_group = list()
+            temp = params.group_number_list[edge_index]
+            for k in range(temp):
+                data_miss_list_one_group.append(k)
+            for k in range(int(temp * rate)):
+                temp = len(data_miss_list_one_group)
+                data_miss_list_one_group.remove(data_miss_list_one_group[random.randrange(0, temp)])
+            data_miss_list_all_group.append(data_miss_list_one_group)
+        return data_miss_list_all_group
 
     def client_upload_data(self, all_group_in_client_data_index, de_all_group_client_data_index):
-        # 根据数据添加位置处理用户数据
+        # 用户生成ru
+        self.clientManager.generate_ru()
+        # 用户生成加密的ru
+        self.clientManager.generate_encrypt_ru()
         # 用户生成要添加的hash噪声
         self.clientManager.generate_hash_noise_data(de_all_group_client_data_index)
         # 用户生成上传数据
         return self.clientManager.generate_update_data(all_group_in_client_data_index)
 
-    def cloud_server_generate_hash_noise(self, client_ru_all_group):
-        self.cloudServer.generate_hash_noise_all_group(client_ru_all_group)
+    def cloud_server_generate_hash_noise(self, client_encrypt_ru_all_group, data_miss_list_all_group):
+        self.cloudServer.generate_hash_noise_all_group(client_encrypt_ru_all_group, data_miss_list_all_group)
         return self.cloudServer.hash_noise_others_group
 
-    def edge_aggregation_client_data(self, client_masking_data_all_group):
-        self.edgeManager.aggregation_all_group_client_data(client_masking_data_all_group)
+    def edge_aggregation_client_data(self, client_masking_data_all_group, data_miss_list_all_group):
+        self.edgeManager.aggregation_all_group_client_data(client_masking_data_all_group, data_miss_list_all_group)
         return self.edgeManager.all_group_aggreagtion_client_data
 
     def edge_generate_edge_masking_data_all_group(self, hash_noise_others_group, count):
@@ -118,6 +136,8 @@ class AnonymousEdgePPTD:
             self.edgeManager.all_group_masking_client_random_index)
         # 聚合用户数据
         self.cloudServer.aggregation_edge_masking_data_all_group(edge_masking_data_all_group)
+        # 检测极端值
+        self.cloudServer.detection_extreme_data()
         return self.cloudServer.anonymous_all_client_data
 
     def cloud_server_TD(self, anonymous_all_client_data):
@@ -126,6 +146,6 @@ class AnonymousEdgePPTD:
 
     @staticmethod
     def original_data_TD(original_data):
-        td_CRH = TD_CRH(original_data, params.K, params.M)
+        td_CRH = TD_CRH(original_data, len(original_data), len(original_data[0]))
         td_CRH.TD(params.count)
         return td_CRH.xm_i[params.count]

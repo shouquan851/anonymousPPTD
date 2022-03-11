@@ -40,15 +40,15 @@ class AnonyMousePPTD:
         self.client_manager.generate_masking_data()
         return self.client_manager.all_client_masking_data
 
-    def client_upload_data_(self,all_client_data):
+    def client_upload_data_(self, all_client_data):
         self.client_manager.load_data(all_client_data)
         self.client_manager.generate_noise(2)
         # self.client_manager.verify_noise_data()
         self.client_manager.generate_masking_data()
         return self.client_manager.all_client_masking_data
 
-    def as_aggregation_masking_data(self, all_client_masking_data):
-        self.AS.aggregation_masking_data_all_client(all_client_masking_data)
+    def as_aggregation_masking_data(self, all_client_masking_data, data_miss_list_all_group):
+        self.AS.aggregation_masking_data_all_client(all_client_masking_data, data_miss_list_all_group)
         return self.AS.anonymous_all_client_data
 
     def as_td(self, anonymous_all_client_data):

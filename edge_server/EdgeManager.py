@@ -127,22 +127,23 @@ class EdgeManager:
             random.shuffle(one_group_in_group_client_data_index)
             self.all_group_in_client_data_index.append(one_group_in_group_client_data_index)
 
-    def aggregation_all_group_client_data(self, client_masking_data_all_group):
+    def aggregation_all_group_client_data(self, client_masking_data_all_group, data_miss_list_all_group):
         # 边缘节点聚合用户数据
-        for client_masking_data_one_group in client_masking_data_all_group:
+        for edge_index in range(params.edge_number):
             # 逐组处理
             one_group_aggreagtion_client_data = list()
             for m in range(params.M):
                 # 每组中逐任务处理
                 one_task_group_aggregation_client_data = list()
-                for client_index in range(len(client_masking_data_one_group)):
+                for client_index in range(params.group_number_list[edge_index]):
                     # 先生成长度为k的向量
                     one_task_group_aggregation_client_data.append(0)
-                for client_index1 in range(len(client_masking_data_one_group)):
+                for client_index1 in range(params.group_number_list[edge_index]):
                     # 逐列聚合用户的数据
-                    for client_index2 in range(len(client_masking_data_one_group)):
-                        one_task_group_aggregation_client_data[client_index1] += \
-                            client_masking_data_one_group[client_index2][m][client_index1]
+                    for client_index2 in range(params.group_number_list[edge_index]):
+                        if client_index2 not in data_miss_list_all_group[edge_index]:
+                            one_task_group_aggregation_client_data[client_index1] += \
+                                client_masking_data_all_group[edge_index][client_index2][m][client_index1]
                 one_group_aggreagtion_client_data.append(one_task_group_aggregation_client_data)
             self.all_group_aggreagtion_client_data.append(one_group_aggreagtion_client_data)
 

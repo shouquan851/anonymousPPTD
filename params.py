@@ -8,6 +8,7 @@ unreliable_start = 60
 unreliable_end = 70
 reliable_start = 90
 reliable_end = 99
+miss_rate = 1  # 1表示不缺失,越接近0 缺失越多
 
 # TD
 K = client_number

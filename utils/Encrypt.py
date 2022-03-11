@@ -38,17 +38,17 @@ class Encrypt:
 
     @staticmethod
     def aes_encryptor(key, plaintext):
-        cipher = Cipher(algorithms.AES(key), modes.ECB())
+        cipher = Cipher(algorithms.AES(key), modes.CFB(b"a" * 16))
         encryptor = cipher.encryptor()
-        ct = encryptor.update(bytes(plaintext)) + encryptor.finalize()
+        ct = encryptor.update(plaintext.to_bytes(4, byteorder='big')) + encryptor.finalize()
         return ct
 
     @staticmethod
     def aes_decryptor(key, ciphertext):
-        cipher = Cipher(algorithms.AES(key), modes.ECB())
+        cipher = Cipher(algorithms.AES(key), modes.CFB(b"a" * 16))
         decryptor = cipher.decryptor()
         dt = decryptor.update(ciphertext) + decryptor.finalize()
-        return dt
+        return int.from_bytes(dt,byteorder='big')
 
     @staticmethod
     def aes_list_encryptor(key, plain_list: list):

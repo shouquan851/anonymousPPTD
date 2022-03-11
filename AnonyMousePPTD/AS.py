@@ -8,18 +8,26 @@ class AS:
     def __init__(self):
         print("init AS")
 
-    def aggregation_masking_data_all_client(self, all_client_masking_data):
+    def aggregation_masking_data_all_client(self, all_client_masking_data, data_miss_list_all_group):
         """
         中心服务器聚合用户数据
         :param all_client_masking_data:
         :return:
         """
+        data_miss_list = list()
+        count = 0
+        for edge_index in range(len(data_miss_list_all_group)):
+            for miss_index in data_miss_list_all_group[edge_index]:
+                data_miss_list.append(count + miss_index)
+            count += params.group_number_list[edge_index]
+
         for k in range(params.K):
             anonymous_one_client_data = list()
             for m in range(params.M):
                 temp = 0
                 for j in range(params.K):
-                    temp += all_client_masking_data[j][m][k]
+                    if j not in data_miss_list:
+                        temp += all_client_masking_data[j][m][k]
                 anonymous_one_client_data.append(temp)
             self.anonymous_all_client_data.append(anonymous_one_client_data)
 

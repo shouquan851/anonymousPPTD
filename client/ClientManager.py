@@ -8,15 +8,17 @@ class ClientManager:
     public_key_client_list = list()
     private_key_client_list = list()
     aes_key_list_all_group = list()
+    aes_key_with_cloud_list_all_group = list()
     client_data_all_group = list()
     client_ru_all_group = list()
+    client_encrypt_ru_all_group = list()
     hash_noise_all_group = list()
 
     def __init__(self):
         print("init ClientManager")
 
     def generate_dh_key(self, client_count):
-        encrypt = Encrypt(params.p,params.g)
+        encrypt = Encrypt(params.p, params.g)
         public_key_list = list()
         private_key_list = list()
         for i in range(client_count):
@@ -26,8 +28,20 @@ class ClientManager:
         self.public_key_client_list = public_key_list
         self.private_key_client_list = private_key_list
 
+    def generate_aes_key_with_cloud(self, public_server_key):
+        encrypt = Encrypt(params.p, params.g)
+        count = 0  # 已处理过的组的用户数量
+        for edge_index in range(params.edge_number):
+            aes_key_with_cloud_list_one_group = list()
+            for k in range(params.group_number_list[edge_index]):
+                aes_key_with_cloud_list_one_group.append(
+                    encrypt.generate_aes_key(self.private_key_client_list[count + k],
+                                             self.public_key_client_list[count + k], public_server_key))
+            self.aes_key_with_cloud_list_all_group.append(aes_key_with_cloud_list_one_group)
+            count += params.group_number_list[edge_index]
+
     def generate_aes_key(self):
-        encrypt = Encrypt(params.p,params.g)
+        encrypt = Encrypt(params.p, params.g)
         # 为每个组内的所有用户和其他所有用户协商对称密钥
         count = 0  # 已处理过的组的用户数量
         group_index = 1
@@ -95,6 +109,17 @@ class ClientManager:
                 hash_noise_one_group.append(hash_noise_one_client)
             self.hash_noise_all_group.append(hash_noise_one_group)
 
+    def generate_encrypt_ru(self):
+        """用户端加密ru
+        """
+        for edge_index in range(params.edge_number):
+            client_encrypt_ru_one_group = list()
+            for k in range(params.group_number_list[edge_index]):
+                client_encrypt_ru_one_group.append(
+                    Encrypt.aes_encryptor(self.aes_key_with_cloud_list_all_group[edge_index][k],
+                                          self.client_ru_all_group[edge_index][k]))
+            self.client_encrypt_ru_all_group.append(client_encrypt_ru_one_group)
+
     def generate_update_data(self, all_group_in_client_data_index):
         """
         根据数据添加位置,生成处理过的数据
@@ -132,11 +157,11 @@ class ClientManager:
             client_masking_data_all_group.append(client_masking_data_one_group)
         return client_masking_data_all_group
 
+
 # 打印密钥交换结果
 # for aes_key_list_one_group in aes_key_list_all_group:
 #     for aes_key_list_one_client in aes_key_list_one_group:
 #         print(aes_key_list_one_client)
-
 # encrypt = Encrypt()
 # ct = Encrypt.aes_encryptor(aes_key_list_all_client[0][1], b"a" * 16)
 # dt = Encrypt.aes_decryptor(aes_key_list_all_client[1][0], ct)

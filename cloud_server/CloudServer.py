@@ -17,23 +17,33 @@ class CloudServer:
         print("init CloudServer")
 
     def generate_dh_key(self):
-        encrypt = Encrypt(params.p,params.g)
+        encrypt = Encrypt(params.p, params.g)
         self.private_server_key, self.public_server_key = encrypt.generate_dh_key()
 
     def generate_aes_key(self, public_key_client_list):
         aes_key_list_with_client = list()
-        encrypt = Encrypt(params.p,params.g)
+        encrypt = Encrypt(params.p, params.g)
         for public_key_client in public_key_client_list:
             aes_key_list_with_client.append(
                 encrypt.generate_aes_key(self.private_server_key, self.public_server_key, public_key_client))
         self.aes_key_list_with_client = aes_key_list_with_client
 
-    def generate_hash_noise_all_group(self, client_ru_all_group):
+    def generate_hash_noise_all_group(self, client_encrypt_ru_all_group, data_miss_list_all_group):
         """
         云中心生成hash噪声
-        :param client_ru_all_group:
+        :param client_encrypt_ru_all_group:
         :return:
         """
+        client_ru_all_group = list()
+        count = 0
+        for edge_index in range(params.edge_number):
+            client_ru_one_group = list()
+            for k in range(params.group_number_list[edge_index]):
+                client_ru_one_group.append(Encrypt.aes_decryptor(self.aes_key_list_with_client[count + k],
+                                                                 client_encrypt_ru_all_group[edge_index][k]))
+            count += params.group_number_list[edge_index]
+            client_ru_all_group.append(client_ru_one_group)
+
         for edge_index in range(params.edge_number):
             hash_noise_one_group = list()
             for m in range(params.M):
@@ -43,8 +53,10 @@ class CloudServer:
                     for edge_index2 in range(params.edge_number):
                         if edge_index != edge_index2:
                             for client_index in range(params.group_number_list[edge_index2]):
-                                temp = client_ru_all_group[edge_index2][client_index] + k + m
-                                noise += Encrypt.hash_random(temp)
+                                # 删除未上传用户的数据
+                                if client_index not in data_miss_list_all_group[edge_index2]:
+                                    temp = client_ru_all_group[edge_index2][client_index] + k + m
+                                    noise += Encrypt.hash_random(temp)
                     hash_noise_one_group_one_task.append(noise)
                 hash_noise_one_group.append(hash_noise_one_group_one_task)
             self.hash_noise_others_group.append(hash_noise_one_group)
@@ -54,8 +66,10 @@ class CloudServer:
                 noise = 0
                 for edge_index in range(params.edge_number):
                     for client_index in range(params.group_number_list[edge_index]):
-                        temp = client_ru_all_group[edge_index][client_index] + k + m
-                        noise += Encrypt.hash_random(temp)
+                        # 删除未上传用户的数据
+                        if client_index not in data_miss_list_all_group[edge_index]:
+                            temp = client_ru_all_group[edge_index][client_index] + k + m
+                            noise += Encrypt.hash_random(temp)
                 hash_noise_all_group_one_task.append(noise)
             self.hash_noise_all_group.append(hash_noise_all_group_one_task)
 
@@ -87,7 +101,17 @@ class CloudServer:
                 anonymous_one_client_data.append(temp)
             self.anonymous_all_client_data.append(anonymous_one_client_data)
 
+    def detection_extreme_data(self):
+        extreme_data_list = list()
+        for k in range(len(self.anonymous_all_client_data)):
+            for m in range(params.M):
+                if self.anonymous_all_client_data[k][m] == 0:
+                    extreme_data_list.append(self.anonymous_all_client_data[k])
+                    break
+        for extreme_data in extreme_data_list:
+            self.anonymous_all_client_data.remove(extreme_data)
+
     def td_in_anonymous_data(self, anonymous_all_client_data):
-        td_CRH = TD_CRH(anonymous_all_client_data, params.K, params.M)
+        td_CRH = TD_CRH(anonymous_all_client_data, len(anonymous_all_client_data), len(anonymous_all_client_data[0]))
         td_CRH.TD(params.count)
         self.td_result = td_CRH.xm_i[params.count]
