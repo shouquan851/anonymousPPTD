@@ -1,3 +1,4 @@
+import copy
 import hashlib
 import time
 
@@ -48,7 +49,7 @@ class Encrypt:
         cipher = Cipher(algorithms.AES(key), modes.CFB(b"a" * 16))
         decryptor = cipher.decryptor()
         dt = decryptor.update(ciphertext) + decryptor.finalize()
-        return int.from_bytes(dt,byteorder='big')
+        return int.from_bytes(dt, byteorder='big')
 
     @staticmethod
     def aes_list_encryptor(key, plain_list: list):
@@ -59,10 +60,30 @@ class Encrypt:
         return ct
 
     @staticmethod
+    def aes_list_encryptor_(key, plain_list: list):
+        """
+        用户数量超过256时需要用这种加密方式
+        """
+        ct = list()
+        for value in plain_list:
+            ct.append(Encrypt.aes_encryptor(key, value))
+        return ct
+
+    @staticmethod
     def aes_list_decryptor(key, ciphertext):
         cipher = Cipher(algorithms.AES(key), modes.CFB(b"a" * 16))
         decryptor = cipher.decryptor()
         dt = decryptor.update(ciphertext) + decryptor.finalize()
+        return list(dt)
+
+    @staticmethod
+    def aes_list_decryptor_(key, ciphertext):
+        """
+        用户数量超过256时需要用这种加密方式
+        """
+        dt = list()
+        for ct in ciphertext:
+            dt.append(Encrypt.aes_decryptor(key, ct))
         return list(dt)
 
     @staticmethod
@@ -90,26 +111,35 @@ class Encrypt:
 
 # if __name__ == '__main__':
 #     print('PyCharm')
-# encrypt = Encrypt()
-# a_pri, a_pub = encrypt.generate_dh_key()
-# b_pri, b_pub = encrypt.generate_dh_key()
-# key = encrypt.generate_aes_key(a_pri, a_pub, b_pub)
-# key1 = encrypt.generate_aes_key(b_pri, b_pub, a_pub)
+encrypt = Encrypt(params.p, params.g)
+a_pri, a_pub = encrypt.generate_dh_key()
+b_pri, b_pub = encrypt.generate_dh_key()
+key = encrypt.generate_aes_key(a_pri, a_pub, b_pub)
+key1 = encrypt.generate_aes_key(b_pri, b_pub, a_pub)
 # print(key)
 # print(key1)
 # print(key == key1)
 # print(Encrypt.aes_decryptor(key, Encrypt.aes_encryptor(key, b"a" * 16)))
 #
-# text = [15, 21, 9, 28, 18, 12, 11, 24, 19, 0,15, 21, 9, 28, 18, 12, 11, 24, 19, 0,15, 21, 9, 28, 18, 12, 11, 24, 19, 0,15, 21, 9, 28, 18, 12, 11, 24, 19, 0,15, 21, 9, 28, 18, 12, 11, 24, 19, 0,15, 21, 9, 28, 18, 12, 11, 24, 19, 0,15, 21, 9, 28, 18, 12, 11, 24, 19, 0,15, 21, 9, 28, 18, 12, 11, 24, 19, 0,15, 21, 9, 28, 18, 12, 11, 24, 19, 0,15, 21, 9, 28, 18, 12, 11, 24, 19, 0,15, 21, 9, 28, 18, 12, 11, 24, 19, 0,15, 21, 9, 28, 18, 12, 11, 24, 19, 0]
-# text = [15, 21, 9, 28, 18, 12, 11, 24, 19, 0]
-# print(text.index(9))
-# print(text.index(10))
-# ct = Encrypt.aes_list_encryptor(key, text)
-# print(ct)
-# print(ct[0:10])
-# print(func.bytes_to_list(ct))
-# dt = Encrypt.aes_list_decryptor(key1, ct)
-# print(dt)
+
+text = [15, 21, 9, 28, 18, 12, 11, 24, 105, 0]
+pliant = list()
+for i in range(100):
+    pliant += copy.copy(text)
+print(len(pliant))
+
+times = 10
+start_1 = time.perf_counter()
+for count in range(times):
+    ct = Encrypt.aes_list_encryptor(key, pliant)
+    dt = Encrypt.aes_list_decryptor(key, ct)
+start_2 = time.perf_counter()
+for count in range(times):
+    ct = Encrypt.aes_list_encryptor_(key, pliant)
+    dt = Encrypt.aes_list_decryptor_(key, ct)
+start_3 = time.perf_counter()
+print(start_2 - start_1)
+print(start_3 - start_2)
 #
 # print(Encrypt.hash_random(0))
 
@@ -117,28 +147,27 @@ class Encrypt:
 # start_1 = time.perf_counter()
 # for i in range(times):
 #     a = func.list_to_bytes(text)
-#     # b = func.bytes_to_list(a)
+#     b = func.bytes_to_list(a)
 # start_2 = time.perf_counter()
 # for i in range(times):
 #     a = bytes(text)
-#     # b = list(a)
+#     b = list(a)
 # start_3 = time.perf_counter()
-#
+
 # print(start_2 - start_1)
 # print(start_3 - start_2)
 
 # seed = 1000000000
-# times = 100000
+# a = bytes(seed)
+# times = 10000
 # start_1 = time.perf_counter()
 # for i in range(times):
 #     a = bytes(seed)
-#     # b = func.bytes_to_list(a)
+#     # b = int.from_bytes(a,byteorder='big')
 # start_2 = time.perf_counter()
 # for i in range(times):
 #     a = seed.to_bytes(32, byteorder='big')
 #     # b = int.from_bytes(a,byteorder='big')
-#     # print(b)
-#     # b = list(a)
 # start_3 = time.perf_counter()
 #
 # print(start_2-start_1)

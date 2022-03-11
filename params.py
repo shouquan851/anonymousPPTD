@@ -1,6 +1,6 @@
 edge_number = 4
-client_number = 100
-group_number_list = [20, 20, 20, 40]
+client_number = 500
+group_number_list = [100, 100, 100, 200]
 
 # datagenerate
 # 可靠程度,越接近100 越可靠
