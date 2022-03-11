@@ -1,3 +1,4 @@
+import copy
 import random
 import time
 
@@ -14,6 +15,11 @@ class AnonymousEdgePPTD:
     edgeManager = None
     cloudServer = None
     dataGenerator = None
+    extreme_data_index = list()
+    data_miss_list_all_group = list()
+    all_client_data = list()
+    origin_client_data = list()
+    data_section = list()
 
     def __init__(self):
         self.clientManager = ClientManager()
@@ -57,16 +63,50 @@ class AnonymousEdgePPTD:
         # 打印basedata
         print("basedata")
         print(self.dataGenerator.base_data)
-        client_data = self.dataGenerator.generate_client_data()
+        # 计算极端值检测区间
+        for base_data in self.dataGenerator.base_data:
+            data_section_one_task = list()
+            data_section_one_task.append(base_data * params.extreme_detection_small_rate)
+            data_section_one_task.append(base_data * params.extreme_detection_big_rate)
+            self.data_section.append(data_section_one_task)
+
+        self.dataGenerator.generate_client_data()
+        self.all_client_data = self.dataGenerator.all_client_data
+        self.origin_client_data = copy.deepcopy(self.all_client_data)
+        return self.all_client_data
+
+    def generate_extreme_data_index(self, k, m, extreme_client_rate, extreme_task_rate):
+        extreme_data_index = list()
+        for k_ in range(k):
+            extreme_data_index_one_cliet = list()
+            for m_ in range(m):
+                extreme_data_index_one_cliet.append(0)
+            if random.randrange(0, k) < int(extreme_client_rate * k):
+                if random.randrange(0,1000) < params.spite_client_vs_error_client:
+                    # 是恶意用户
+                    for m_ in range(int(m * extreme_task_rate)):
+                        extreme_data_index_one_cliet[m_] = 1
+                        # extreme_data_index_one_cliet[random.randrange(0,m)] = 1
+                else:
+                    # 是传感器偏差
+                    for m_ in range(int(m * extreme_task_rate)):
+                        extreme_data_index_one_cliet[m_] = 2
+                        # extreme_data_index_one_cliet[random.randrange(0,m)] = 1
+            extreme_data_index.append(extreme_data_index_one_cliet)
+        self.extreme_data_index = extreme_data_index
+
+    def add_extreme_data(self):
+        for k in range(params.K):
+            for m in range(params.M):
+                # 恶意用户情况下的极端值
+                if self.extreme_data_index[k][m] == 1:
+                    self.all_client_data[k][m] = params.extreme_data
+                if self.extreme_data_index[k][m] == 2:
+                    self.all_client_data[k][m] = self.all_client_data[k][m]*params.error_rate
+
+    def client_load_data(self, all_client_data):
         # 将用户数据加载到clientManager中
-        self.clientManager.load_data(client_data)
-        # 打印用户数据
-        # index = 1
-        # for client_data_one_group in self.clientManager.client_data_all_group:
-        #     print("第%d组" % index)
-        #     index += 1
-        #     for client_data_one in client_data_one_group:
-        #         print(client_data_one)
+        self.clientManager.load_data(all_client_data)
 
     def generate_data_index(self, edge_en_data_index):
         """
@@ -95,6 +135,11 @@ class AnonymousEdgePPTD:
     #     return self.clientManager.client_ru_all_group
 
     def generate_data_miss_list(self, rate):
+        """
+        生成掉线用户的索引
+        :param rate:
+        :return:
+        """
         data_miss_list_all_group = list()
         for edge_index in range(params.edge_number):
             data_miss_list_one_group = list()
@@ -105,6 +150,7 @@ class AnonymousEdgePPTD:
                 temp = len(data_miss_list_one_group)
                 data_miss_list_one_group.remove(data_miss_list_one_group[random.randrange(0, temp)])
             data_miss_list_all_group.append(data_miss_list_one_group)
+        self.data_miss_list_all_group = data_miss_list_all_group
         return data_miss_list_all_group
 
     def client_upload_data(self, all_group_in_client_data_index, de_all_group_client_data_index):
@@ -130,17 +176,18 @@ class AnonymousEdgePPTD:
         self.edgeManager.generate_edge_masking_data_all_group(hash_noise_others_group)
         return self.edgeManager.edge_masking_data_all_group
 
-    def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group):
+    def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group, data_section):
         # 聚合hash噪声的位置
         self.cloudServer.aggregation_all_group_masking_client_random_index(
             self.edgeManager.all_group_masking_client_random_index)
         # 聚合用户数据
         self.cloudServer.aggregation_edge_masking_data_all_group(edge_masking_data_all_group)
         # 检测极端值
-        self.cloudServer.detection_extreme_data()
+        self.cloudServer.detection_extreme_data(data_section)
         return self.cloudServer.anonymous_all_client_data
 
     def cloud_server_TD(self, anonymous_all_client_data):
+        print("收到%d个有效的用户数据" % (len(anonymous_all_client_data)))
         self.cloudServer.td_in_anonymous_data(anonymous_all_client_data)
         return self.cloudServer.td_result
 

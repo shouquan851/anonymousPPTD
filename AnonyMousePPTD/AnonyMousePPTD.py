@@ -47,10 +47,12 @@ class AnonyMousePPTD:
         self.client_manager.generate_masking_data()
         return self.client_manager.all_client_masking_data
 
-    def as_aggregation_masking_data(self, all_client_masking_data, data_miss_list_all_group):
+    def as_aggregation_masking_data(self, all_client_masking_data, data_miss_list_all_group,data_section):
         self.AS.aggregation_masking_data_all_client(all_client_masking_data, data_miss_list_all_group)
+        self.AS.detection_extreme_data(data_section)
         return self.AS.anonymous_all_client_data
 
     def as_td(self, anonymous_all_client_data):
+        print("收到%d个有效的用户数据" % (len(anonymous_all_client_data)))
         self.AS.td_in_anonymous_data(anonymous_all_client_data)
         return self.AS.td_result

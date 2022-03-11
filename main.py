@@ -10,10 +10,18 @@ def run_once():
     anonymousEdgePPTD.key_agreement()
     # 生成数据
     anonymousEdgePPTD.data_generator()
+
+    # 添加极端值
+    anonymousEdgePPTD.generate_extreme_data_index(params.K, params.M, params.extreme_client_rate,
+                                                  params.extreme_task_rate)
+    anonymousEdgePPTD.add_extreme_data()
+
     # 边缘节点之间协商数据上传位置
     all_group_in_client_data_index = anonymousEdgePPTD.generate_data_index(params.select_index)  # 组内数据添加位置
     de_all_group_client_data_index = anonymousEdgePPTD.edgeManager.de_all_group_client_data_index  # 整体数据添加位置
 
+    # 客户端加载数据
+    anonymousEdgePPTD.client_load_data(anonymousEdgePPTD.all_client_data)
     # 客户端上传数据
     client_masking_data_all_group = anonymousEdgePPTD.client_upload_data(all_group_in_client_data_index,
                                                                          de_all_group_client_data_index)  # 生成要上传的数据
@@ -30,13 +38,13 @@ def run_once():
                                                                                               2)
     # 云中心聚合数据
     anonymous_all_client_data = anonymousEdgePPTD.cloud_server_aggregation_edge_masking_data(
-        edge_masking_data_all_group)
+        edge_masking_data_all_group, anonymousEdgePPTD.data_section)
     # 云中心执行TD
     td_result_anonymous_all_client_data = anonymousEdgePPTD.cloud_server_TD(anonymous_all_client_data)
     print("真值发现结果")
     print(td_result_anonymous_all_client_data)
     # 对原始数据做TD,和匿名后云中心做TD进行比较
-    td_result_original_data = anonymousEdgePPTD.original_data_TD(anonymousEdgePPTD.dataGenerator.all_client_data)
+    td_result_original_data = anonymousEdgePPTD.original_data_TD(anonymousEdgePPTD.origin_client_data)
     print("原始数据真值发现结果")
     print(td_result_original_data)
 
@@ -48,8 +56,10 @@ def run_once():
     # DR生成有各个用户的随机数种子，以及数据添加位置
     seed_list, all_data_index_list = anonyMousePPTD.DR_init()
     anonyMousePPTD.client_init(seed_list, all_data_index_list)
-    all_client_masking_data = anonyMousePPTD.client_upload_data_(anonymousEdgePPTD.dataGenerator.all_client_data)
-    anonymous_all_client_data = anonyMousePPTD.as_aggregation_masking_data(all_client_masking_data,data_miss_list_all_group)
+    all_client_masking_data = anonyMousePPTD.client_upload_data_(anonymousEdgePPTD.all_client_data)
+    anonymous_all_client_data = anonyMousePPTD.as_aggregation_masking_data(all_client_masking_data,
+                                                                           data_miss_list_all_group,
+                                                                           anonymousEdgePPTD.data_section)
     td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
     print("真值发现结果")
     print(td_result_anonymous_all_client_data)
