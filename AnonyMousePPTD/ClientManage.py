@@ -13,7 +13,7 @@ class ClientManage:
     all_client_masking_data = list()
 
     def __init__(self):
-        print("init ClientManage")
+        pass
 
     def load_seed_and_data_index(self, seed_list, all_data_index_list):
         """

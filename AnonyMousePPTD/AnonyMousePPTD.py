@@ -14,8 +14,8 @@ class AnonyMousePPTD:
         self.DR = DR()
         self.client_manager = ClientManage()
         self.AS = AS()
-        self.dataGenerator = DataGenerator()
-        print("init AnonyMousePPTD")
+        # self.dataGenerator = DataGenerator()
+        print("对比方案初始化完成")
 
     def DR_init(self):
         self.DR.generate_seed()
@@ -33,7 +33,7 @@ class AnonyMousePPTD:
         print(self.dataGenerator.base_data)
 
     def client_upload_data(self):
-        self.data_generator_init()
+        # self.data_generator_init()
         self.client_manager.load_data(self.dataGenerator.generate_client_data())
         self.client_manager.generate_noise(2)
         # self.client_manager.verify_noise_data()

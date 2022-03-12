@@ -8,7 +8,7 @@ class DR:
     all_data_index_list = list()
 
     def __init__(self):
-        print("init DR")
+        pass
 
     def generate_seed(self):
         """

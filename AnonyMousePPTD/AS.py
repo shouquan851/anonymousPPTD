@@ -6,7 +6,7 @@ class AS:
     anonymous_all_client_data = list()
 
     def __init__(self):
-        print("init AS")
+        pass
 
     def aggregation_masking_data_all_client(self, all_client_masking_data, data_miss_list_all_group):
         """
