@@ -1,6 +1,6 @@
 edge_number = 4
-client_number = 500
-group_number_list = [100, 100, 100, 200]
+client_number = 100
+group_number_list = [20, 20, 20, 40]
 
 # datagenerate
 # 可靠程度,越接近100 越可靠
@@ -9,12 +9,12 @@ unreliable_end = 70
 reliable_start = 90
 reliable_end = 99
 miss_rate = 1  #  用户掉线情况 1表示不缺失,越接近0 缺失越多
-extreme_client_rate = 0.01  # 提交极端值的用户比率 越接近1 越多
+extreme_client_rate = 0.1  # 提交极端值的用户比率 越接近1 越多
 extreme_task_rate = 1  # 提交极端值的用户任务极端的比率 越接近1 越多
 error_rate = 3
-spite_client_vs_error_client = 1000  # 恶意用户和传感器偏差的可能 该数值越大,则越有可能是传感器偏差
+spite_client_vs_error_client = 1  # 恶意用户和传感器偏差的可能 该数值越大,则越有可能是恶意用户
 extreme_detection_flag = True  # 是否进行极端值检测
-extreme_detection_flag_ = False  # 对比方案是否进行极端值检测
+extreme_detection_flag_ = True  # 对比方案是否进行极端值检测
 extreme_detection_small_rate = 0.5
 extreme_detection_big_rate = 1.5
 extreme_data = 100000000

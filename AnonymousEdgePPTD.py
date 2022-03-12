@@ -15,11 +15,13 @@ class AnonymousEdgePPTD:
     edgeManager = None
     cloudServer = None
     dataGenerator = None
+    base_data_list = list()
     extreme_data_index = list()
     data_miss_list_all_group = list()
     all_client_data = list()
     origin_client_data = list()
     data_section = list()
+
 
     def __init__(self):
         self.clientManager = ClientManager()
@@ -62,6 +64,7 @@ class AnonymousEdgePPTD:
         self.dataGenerator.generate_base_data(10, 0, 100, 99)
         # 打印basedata
         print("basedata")
+        self.base_data_list = self.dataGenerator.base_data
         print(self.dataGenerator.base_data)
         # 计算极端值检测区间
         for base_data in self.dataGenerator.base_data:

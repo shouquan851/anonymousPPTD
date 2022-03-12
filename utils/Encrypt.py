@@ -111,35 +111,35 @@ class Encrypt:
 
 # if __name__ == '__main__':
 #     print('PyCharm')
-encrypt = Encrypt(params.p, params.g)
-a_pri, a_pub = encrypt.generate_dh_key()
-b_pri, b_pub = encrypt.generate_dh_key()
-key = encrypt.generate_aes_key(a_pri, a_pub, b_pub)
-key1 = encrypt.generate_aes_key(b_pri, b_pub, a_pub)
+# encrypt = Encrypt(params.p, params.g)
+# a_pri, a_pub = encrypt.generate_dh_key()
+# b_pri, b_pub = encrypt.generate_dh_key()
+# key = encrypt.generate_aes_key(a_pri, a_pub, b_pub)
+# key1 = encrypt.generate_aes_key(b_pri, b_pub, a_pub)
 # print(key)
 # print(key1)
 # print(key == key1)
 # print(Encrypt.aes_decryptor(key, Encrypt.aes_encryptor(key, b"a" * 16)))
 #
 
-text = [15, 21, 9, 28, 18, 12, 11, 24, 105, 0]
-pliant = list()
-for i in range(100):
-    pliant += copy.copy(text)
-print(len(pliant))
-
-times = 10
-start_1 = time.perf_counter()
-for count in range(times):
-    ct = Encrypt.aes_list_encryptor(key, pliant)
-    dt = Encrypt.aes_list_decryptor(key, ct)
-start_2 = time.perf_counter()
-for count in range(times):
-    ct = Encrypt.aes_list_encryptor_(key, pliant)
-    dt = Encrypt.aes_list_decryptor_(key, ct)
-start_3 = time.perf_counter()
-print(start_2 - start_1)
-print(start_3 - start_2)
+# text = [15, 21, 9, 28, 18, 12, 11, 24, 105, 0]
+# pliant = list()
+# for i in range(100):
+#     pliant += copy.copy(text)
+# print(len(pliant))
+#
+# times = 10
+# start_1 = time.perf_counter()
+# for count in range(times):
+#     ct = Encrypt.aes_list_encryptor(key, pliant)
+#     dt = Encrypt.aes_list_decryptor(key, ct)
+# start_2 = time.perf_counter()
+# for count in range(times):
+#     ct = Encrypt.aes_list_encryptor_(key, pliant)
+#     dt = Encrypt.aes_list_decryptor_(key, ct)
+# start_3 = time.perf_counter()
+# print(start_2 - start_1)
+# print(start_3 - start_2)
 #
 # print(Encrypt.hash_random(0))
 

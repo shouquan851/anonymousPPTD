@@ -1,6 +1,7 @@
 import params
 from AnonyMousePPTD.AnonyMousePPTD import AnonyMousePPTD
 from AnonymousEdgePPTD import AnonymousEdgePPTD
+from utils.TestUtils import TestUtils
 
 
 def run_once():
@@ -39,14 +40,28 @@ def run_once():
     # 云中心聚合数据
     anonymous_all_client_data = anonymousEdgePPTD.cloud_server_aggregation_edge_masking_data(
         edge_masking_data_all_group, anonymousEdgePPTD.data_section)
-    # 云中心执行TD
-    td_result_anonymous_all_client_data = anonymousEdgePPTD.cloud_server_TD(anonymous_all_client_data)
-    print("真值发现结果")
-    print(td_result_anonymous_all_client_data)
-    # 对原始数据做TD,和匿名后云中心做TD进行比较
+
+    print("***********************************************************************")
+    print("开始进行真值发现")
+    # 对原始数据做TD
     td_result_original_data = anonymousEdgePPTD.original_data_TD(anonymousEdgePPTD.origin_client_data)
     print("原始数据真值发现结果")
     print(td_result_original_data)
+    print("直接TD的RMSE = %f" % (TestUtils.get_RMSE(td_result_original_data, anonymousEdgePPTD.base_data_list)))
+
+    # 对有离群值数据做TD
+    td_result_original_data = anonymousEdgePPTD.original_data_TD(anonymousEdgePPTD.all_client_data)
+    print("有离群值数据直接真值发现结果")
+    print(td_result_original_data)
+    print("直接TD的RMSE = %f" % (TestUtils.get_RMSE(td_result_original_data, anonymousEdgePPTD.base_data_list)))
+
+    # 云中心执行TD
+    print("************************************************************************")
+    print("云中心TD")
+    td_result_anonymous_all_client_data = anonymousEdgePPTD.cloud_server_TD(anonymous_all_client_data)
+    print("真值发现结果")
+    print(td_result_anonymous_all_client_data)
+    print("本方案RMSE = %f" % (TestUtils.get_RMSE(td_result_anonymous_all_client_data, anonymousEdgePPTD.base_data_list)))
 
     # 执行对比方案
     print("************************************************************************")
@@ -63,6 +78,7 @@ def run_once():
     td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
     print("真值发现结果")
     print(td_result_anonymous_all_client_data)
+    print("对比方案RMSE = %f" % (TestUtils.get_RMSE(td_result_anonymous_all_client_data,anonymousEdgePPTD.base_data_list)))
 
 
 def run_test():
