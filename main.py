@@ -78,7 +78,23 @@ def run_once():
     td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
     print("真值发现结果")
     print(td_result_anonymous_all_client_data)
-    print("对比方案RMSE = %f" % (TestUtils.get_RMSE(td_result_anonymous_all_client_data,anonymousEdgePPTD.base_data_list)))
+    print("对比方案RMSE = %f" % (TestUtils.get_RMSE(td_result_anonymous_all_client_data, anonymousEdgePPTD.base_data_list)))
+
+    print("****************************************************************")
+    print("本方案运行时间")
+    print("one client_time = %f" % (anonymousEdgePPTD.clientManager.all_client_time / params.client_number))
+    print("index_edge_time:")
+    print(anonymousEdgePPTD.edgeManager.index_edge_time)
+    print("aggregation_and_upload_edge_time:")
+    print(anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time)
+    print(
+        "cloud_server_aggreate_time=%f,cloud_server_generate_hash_noise_time=%f" % (
+            anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time,
+            anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time))
+
+    print("对比方案运行时间")
+    print("one client_time = %f" % (anonyMousePPTD.client_manager.all_client_time / params.client_number))
+    print("cloud_server_aggreate_time=%f" % (anonyMousePPTD.AS.cloud_server_aggreate_time))
 
 
 run_once()

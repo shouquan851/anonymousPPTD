@@ -1,3 +1,5 @@
+import time
+
 import params
 from utils.Encrypt import Encrypt
 from utils.TD_CRH import TD_CRH
@@ -12,6 +14,10 @@ class CloudServer:
     hash_noise_all_group = list()
     hash_noise_others_group = list()
     hash_noise_index = list()
+    cloud_server_aggreate_time = 0
+    cloud_server_generate_hash_noise_time = 0
+    extream_detection_time = 0
+    td_time = 0
 
     def __init__(self):
         print("init CloudServer")
@@ -30,10 +36,11 @@ class CloudServer:
 
     def generate_hash_noise_all_group(self, client_encrypt_ru_all_group, data_miss_list_all_group):
         """
-        云中心生成hash噪声
+        云中心生成hash噪声  此处需要进一步优化
         :param client_encrypt_ru_all_group:
         :return:
         """
+        start_time = time.perf_counter()
         client_ru_all_group = list()
         count = 0
         for edge_index in range(params.edge_number):
@@ -60,6 +67,7 @@ class CloudServer:
                     hash_noise_one_group_one_task.append(noise)
                 hash_noise_one_group.append(hash_noise_one_group_one_task)
             self.hash_noise_others_group.append(hash_noise_one_group)
+
         for m in range(params.M):
             hash_noise_all_group_one_task = list()
             for k in range(params.K):
@@ -72,6 +80,9 @@ class CloudServer:
                             noise += Encrypt.hash_random(temp)
                 hash_noise_all_group_one_task.append(noise)
             self.hash_noise_all_group.append(hash_noise_all_group_one_task)
+        end_time = time.perf_counter()
+        # 主要计算开销
+        self.cloud_server_generate_hash_noise_time += (end_time - start_time) * 1000
 
     def aggregation_all_group_masking_client_random_index(self, all_group_masking_client_random_index):
         """
@@ -79,11 +90,14 @@ class CloudServer:
         :param all_group_masking_client_random_index:
         :return:
         """
+        start_time = time.perf_counter()
         for k in range(params.K):
             self.hash_noise_index.append(0)
         for k in range(params.K):
             for edge_index in range(params.edge_number):
                 self.hash_noise_index[k] += all_group_masking_client_random_index[edge_index][k]
+        end_time = time.perf_counter()
+        self.cloud_server_generate_hash_noise_time += (end_time - start_time) * 1000
 
     def aggregation_edge_masking_data_all_group(self, edge_masking_data_all_group):
         """
@@ -91,6 +105,7 @@ class CloudServer:
         :param edge_masking_data_all_group:
         :return:
         """
+        start_time = time.perf_counter()
         for k in range(params.K):
             anonymous_one_client_data = list()
             for m in range(params.M):
@@ -100,8 +115,11 @@ class CloudServer:
                 temp -= self.hash_noise_all_group[m][self.hash_noise_index[k]]
                 anonymous_one_client_data.append(temp)
             self.anonymous_all_client_data.append(anonymous_one_client_data)
+        end_time = time.perf_counter()
+        self.cloud_server_aggreate_time += (end_time - start_time) * 1000
 
     def detection_extreme_data(self, data_section):
+        start_time = time.perf_counter()
         extreme_data_list = list()
         for k in range(len(self.anonymous_all_client_data)):
             for m in range(params.M):
@@ -115,8 +133,13 @@ class CloudServer:
                         break
         for extreme_data in extreme_data_list:
             self.anonymous_all_client_data.remove(extreme_data)
+        end_time = time.perf_counter()
+        self.extream_detection_time += (end_time - start_time) * 1000
 
     def td_in_anonymous_data(self, anonymous_all_client_data):
+        start_time = time.perf_counter()
         td_CRH = TD_CRH(anonymous_all_client_data, len(anonymous_all_client_data), len(anonymous_all_client_data[0]))
         td_CRH.TD(params.count)
         self.td_result = td_CRH.xm_i[params.count]
+        end_time = time.perf_counter()
+        self.td_time += (end_time - start_time) * 1000

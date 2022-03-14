@@ -22,7 +22,6 @@ class AnonymousEdgePPTD:
     origin_client_data = list()
     data_section = list()
 
-
     def __init__(self):
         self.clientManager = ClientManager()
         self.edgeManager = EdgeManager()
@@ -85,7 +84,7 @@ class AnonymousEdgePPTD:
             for m_ in range(m):
                 extreme_data_index_one_cliet.append(0)
             if random.randrange(0, k) < int(extreme_client_rate * k):
-                if random.randrange(0,1000) < params.spite_client_vs_error_client:
+                if random.randrange(0, 1000) < params.spite_client_vs_error_client:
                     # 是恶意用户
                     for m_ in range(int(m * extreme_task_rate)):
                         extreme_data_index_one_cliet[m_] = 1
@@ -105,7 +104,7 @@ class AnonymousEdgePPTD:
                 if self.extreme_data_index[k][m] == 1:
                     self.all_client_data[k][m] = params.extreme_data
                 if self.extreme_data_index[k][m] == 2:
-                    self.all_client_data[k][m] = self.all_client_data[k][m]*params.error_rate
+                    self.all_client_data[k][m] = self.all_client_data[k][m] * params.error_rate
 
     def client_load_data(self, all_client_data):
         # 将用户数据加载到clientManager中

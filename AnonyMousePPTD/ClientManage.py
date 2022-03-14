@@ -1,5 +1,6 @@
 import copy
 import random
+import time
 
 import params
 from utils.Encrypt import Encrypt
@@ -11,6 +12,7 @@ class ClientManage:
     all_client_data = list()
     all_client_noise = list()
     all_client_masking_data = list()
+    all_client_time = 0
 
     def __init__(self):
         pass
@@ -54,6 +56,7 @@ class ClientManage:
     def generate_noise(self, count):
         # 为用户生成噪声
         for i in range(params.K):
+            start_time = time.perf_counter()
             one_client_noise = list()
             for m in range(params.M):
                 one_client_noise_one_task = list()
@@ -64,17 +67,20 @@ class ClientManage:
                         random_noise_1 = Encrypt.random_prf(self.all_client_seed[i][0] + m + k + count)
                         one_client_noise_one_task_a.append(random_noise_1)
                     else:
-                        one_client_noise_one_task_a.append(one_client_noise_one_task_a[k - 1])
+                        one_client_noise_one_task_a.append(Encrypt.random_prf(one_client_noise_one_task_a[k - 1]))
                 one_client_noise_one_task_b = list()
                 for k in range(params.K):
                     if m == 0 or k == 0:
                         random_noise_1 = Encrypt.random_prf(self.all_client_seed[i][1] + m + k + count)
                         one_client_noise_one_task_b.append(random_noise_1)
                     else:
-                        one_client_noise_one_task_b.append(one_client_noise_one_task_b[k - 1])
+                        one_client_noise_one_task_b.append(Encrypt.random_prf(one_client_noise_one_task_b[k - 1]))
                 for k in range(params.K):
                     one_client_noise_one_task.append(one_client_noise_one_task_a[k] - one_client_noise_one_task_b[k])
                 one_client_noise.append(one_client_noise_one_task)
+            end_time = time.perf_counter()
+            self.all_client_time += (end_time - start_time) * 1000
+
             self.all_client_noise.append(one_client_noise)
 
     def verify_noise_data(self):
@@ -92,8 +98,11 @@ class ClientManage:
         """
         self.all_client_masking_data = copy.deepcopy(self.all_client_noise)
         for i in range(params.K):
+            start_time = time.perf_counter()
             for m in range(params.M):
                 for j in range(params.K):
                     if j == self.all_data_index_list[i]:
                         self.all_client_masking_data[i][m][j] = self.all_client_masking_data[i][m][j] + \
                                                                 self.all_client_data[j][m]
+            end_time = time.perf_counter()
+            self.all_client_time += (end_time - start_time) * 1000

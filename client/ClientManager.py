@@ -1,4 +1,5 @@
 import random
+import time
 
 import params
 from utils.Encrypt import Encrypt
@@ -13,6 +14,7 @@ class ClientManager:
     client_ru_all_group = list()
     client_encrypt_ru_all_group = list()
     hash_noise_all_group = list()
+    all_client_time = 0  # ms
 
     def __init__(self):
         print("init ClientManager")
@@ -82,7 +84,10 @@ class ClientManager:
         for edge_index in range(params.edge_number):
             client_ru_one_group = list()
             for k in range(params.group_number_list[edge_index]):
+                start_time = time.perf_counter()
                 client_ru_one_group.append(random.randrange(params.ru_start, params.ru_end))
+                end_time = time.perf_counter()
+                self.all_client_time += (end_time-start_time)*1000
             self.client_ru_all_group.append(client_ru_one_group)
 
     def generate_hash_noise_data(self, de_all_group_client_data_index):
@@ -95,6 +100,8 @@ class ClientManager:
             hash_noise_one_group = list()
             for client_index in range(params.group_number_list[edge_index]):
                 hash_noise_one_client = list()
+
+                start_time = time.perf_counter()
                 for m in range(params.M):
                     hash_noise_one_client_one_task = list()
                     for k in range(params.group_number_list[edge_index]):
@@ -106,6 +113,9 @@ class ClientManager:
                         # 随机数hash
                         hash_noise_one_client_one_task.append(Encrypt.hash_random(temp))
                     hash_noise_one_client.append(hash_noise_one_client_one_task)
+                end_time = time.perf_counter()
+                self.all_client_time += (end_time - start_time) * 1000
+
                 hash_noise_one_group.append(hash_noise_one_client)
             self.hash_noise_all_group.append(hash_noise_one_group)
 
@@ -115,9 +125,14 @@ class ClientManager:
         for edge_index in range(params.edge_number):
             client_encrypt_ru_one_group = list()
             for k in range(params.group_number_list[edge_index]):
+
+                start_time = time.perf_counter()
                 client_encrypt_ru_one_group.append(
                     Encrypt.aes_encryptor(self.aes_key_with_cloud_list_all_group[edge_index][k],
                                           self.client_ru_all_group[edge_index][k]))
+                end_time = time.perf_counter()
+                self.all_client_time += (end_time-start_time)
+
             self.client_encrypt_ru_all_group.append(client_encrypt_ru_one_group)
 
     def generate_update_data(self, all_group_in_client_data_index):
@@ -135,6 +150,8 @@ class ClientManager:
             client_masking_data_one_group = list()
             # 逐个处理组内每个用户的数据
             for client_index in range(len(self.client_data_all_group[group_index])):
+
+                start_time = time.perf_counter()
                 client_masking_data_one = list()
                 # 逐个处理每个用户的每个任务
                 for m in range(params.M):
@@ -151,6 +168,9 @@ class ClientManager:
                                 noise + self.client_data_all_group[group_index][client_index][m])
                     # 把该任务处理后的数据添加进去
                     client_masking_data_one.append(client_masking_data_one_task)
+                end_time = time.perf_counter()
+                self.all_client_time += (end_time-start_time)*1000
+
                 # 把单个用户的数据添加到组内
                 client_masking_data_one_group.append(client_masking_data_one)
             # 把单组用户的数据添加到所有组的数据中

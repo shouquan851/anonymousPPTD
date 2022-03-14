@@ -1,5 +1,6 @@
 import copy
 import random
+import time
 
 import params
 from utils.Encrypt import Encrypt
@@ -19,9 +20,16 @@ class EdgeManager:
     masking = None
     edge_seed_all = list()
     masking_noise_all_edge = list()
+    index_edge_time = list()
+    aggregation_and_upload_edge_time = list()
 
     def __init__(self):
         self.masking = Masking(params.edge_number, params.M, params.K, params.masking_p)
+        self.index_edge_time = list()
+        self.aggregation_and_upload_edge_time = list()
+        for edge_index in range(params.edge_number):
+            self.index_edge_time.append(0)
+            self.aggregation_and_upload_edge_time.append(0)
         print("init EdgeManager")
 
     def generate_dh_key(self, edge_count):
@@ -62,14 +70,20 @@ class EdgeManager:
         all_edge_client_data_index = list()
         # 所有边缘节点生成初始的未加密的数据添加位置向量
         for edge_index in range(params.edge_number):
+
+            start_time = time.perf_counter()
             one_edge_client_data_index = list()
             for k in range(params.K):
                 one_edge_client_data_index.append(k)
             random.shuffle(one_edge_client_data_index)
             # print(one_edge_client_data_index)
+            end_time = time.perf_counter()
+            self.index_edge_time[edge_index] += (end_time - start_time) * 1000
+
             all_edge_client_data_index.append(one_edge_client_data_index)
         # 为所有边缘节点加密身生成的数据添加位置
         for edge_index1 in range(len(all_edge_client_data_index)):
+            start_time = time.perf_counter()
             en_one_edge_client_data_index = bytes()
             one_edge_client_data_index = all_edge_client_data_index[edge_index1]
             start_index = 0
@@ -82,6 +96,8 @@ class EdgeManager:
                 en_one_edge_client_data_index += temp
                 start_index = end_index
             self.en_all_edge_client_data_index.append(en_one_edge_client_data_index)
+            end_time = time.perf_counter()
+            self.index_edge_time[edge_index1] += (end_time - start_time) * 1000
 
     def generate_de_group_client_data_index(self, edge_en_data_index, en_data_list):
         """
@@ -95,8 +111,13 @@ class EdgeManager:
         for edge_index in range(params.edge_number):
             end_index += params.group_number_list[edge_index]
             temp_list = copy.copy(en_data_list[start_index:end_index])
+
+            start_time = time.perf_counter()
             self.de_all_group_client_data_index.append(
                 Encrypt.aes_list_decryptor(self.aes_key_list_all_edge[edge_index][edge_en_data_index], temp_list))
+            end_time = time.perf_counter()
+            self.index_edge_time[edge_index] += (end_time - start_time) * 1000
+
             start_index = end_index
 
     def generate_all_group_masking_client_random_index(self):
@@ -105,6 +126,8 @@ class EdgeManager:
         :return:
         """
         for edge_index in range(params.edge_number):
+
+            start_time = time.perf_counter()
             one_group_masking_client_random_index = list()
             for k in range(params.K):
                 one_group_masking_client_random_index.append(0)
@@ -112,6 +135,10 @@ class EdgeManager:
             for random_index in self.de_all_group_client_data_index[edge_index]:
                 one_group_masking_client_random_index[random_index] = count + params.edge_masking_noise
                 count += 1
+            end_time = time.perf_counter()
+            # print("1=%f"%((end_time-start_time)*1000))
+            self.aggregation_and_upload_edge_time[edge_index] += (end_time - start_time) * 1000
+
             self.all_group_masking_client_random_index.append(one_group_masking_client_random_index)
 
     def generate_in_group_client_data_index(self):
@@ -121,16 +148,22 @@ class EdgeManager:
         """
         for edge_index in range(len(params.group_number_list)):
             # 依次执行每个边缘节点
+            start_time = time.perf_counter()
             one_group_in_group_client_data_index = list()
             for i in range(params.group_number_list[edge_index]):
                 one_group_in_group_client_data_index.append(i)
             random.shuffle(one_group_in_group_client_data_index)
+            end_time = time.perf_counter()
+            self.index_edge_time[edge_index] += (end_time - start_time) * 1000
+
             self.all_group_in_client_data_index.append(one_group_in_group_client_data_index)
 
     def aggregation_all_group_client_data(self, client_masking_data_all_group, data_miss_list_all_group):
         # 边缘节点聚合用户数据
         for edge_index in range(params.edge_number):
             # 逐组处理
+
+            start_time = time.perf_counter()
             one_group_aggreagtion_client_data = list()
             for m in range(params.M):
                 # 每组中逐任务处理
@@ -145,6 +178,10 @@ class EdgeManager:
                             one_task_group_aggregation_client_data[client_index1] += \
                                 client_masking_data_all_group[edge_index][client_index2][m][client_index1]
                 one_group_aggreagtion_client_data.append(one_task_group_aggregation_client_data)
+            end_time = time.perf_counter()
+            # print("2=%f"%((end_time-start_time)*1000))
+            self.aggregation_and_upload_edge_time[edge_index] += (end_time - start_time) * 1000
+
             self.all_group_aggreagtion_client_data.append(one_group_aggreagtion_client_data)
 
     def generate_edge_masking_noise_all_group(self, count):
@@ -153,8 +190,13 @@ class EdgeManager:
         :param count:
         :return:
         """
+        start_time = time.perf_counter()
         self.masking.generate_random_all_client(count)
         self.masking_noise_all_edge = self.masking.generate_masking_noise_all_client()
+        end_time = time.perf_counter()
+        # print("3=%f"%((end_time-start_time)*1000))
+        for edge_index in range(params.edge_number):
+            self.aggregation_and_upload_edge_time[edge_index] += ((end_time - start_time) * 1000) / params.edge_number
 
     def generate_edge_masking_data_all_group(self, hash_noise_others_group):
         """
@@ -162,6 +204,7 @@ class EdgeManager:
         :return:
         """
         for edge_index in range(params.edge_number):
+            start_time = time.perf_counter()
             edge_masking_data_one_group = list()
             # 边缘节点初始化要上传的数据矩阵,此处先把masking的噪声添加了
             for m in range(params.M):
@@ -182,4 +225,8 @@ class EdgeManager:
                     # 边缘节点添加哈希噪声 用户不知道匿名集
                     edge_masking_data_one_group[m][client_data_index] += hash_noise_others_group[edge_index][m][count]
                     count += 1
+            end_time = time.perf_counter()
+            # print("4=%f"%((end_time-start_time)*1000))
+            self.aggregation_and_upload_edge_time[edge_index] += (end_time - start_time) * 1000
+
             self.edge_masking_data_all_group.append(edge_masking_data_one_group)
