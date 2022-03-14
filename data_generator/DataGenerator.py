@@ -9,6 +9,9 @@ class DataGenerator:
     all_client_data = list()
 
     def __init__(self):
+        self.base_data = list()
+        self.reliable_client = list()
+        self.all_client_data = list()
         print("init DataGenerator")
 
     def generate_base_data(self, base_data_rate, base_data_start, base_data_end, reliable_client_rate):
@@ -39,7 +42,7 @@ class DataGenerator:
             for m in range(params.M):
                 # 生成高斯噪声,模拟用户观测不准确
                 noise = self.base_data[m] * random.gauss(0, self.reliable_client[k])
-                one_client_data.append(self.base_data[m] + noise*0.2)
+                one_client_data.append(self.base_data[m] + noise * 0.2)
             all_client_data.append(one_client_data)
         self.all_client_data = all_client_data
         return self.all_client_data

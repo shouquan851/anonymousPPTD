@@ -15,7 +15,12 @@ class ClientManage:
     all_client_time = 0
 
     def __init__(self):
-        pass
+        self.all_client_seed = list()
+        self.all_data_index_list = list()
+        self.all_client_data = list()
+        self.all_client_noise = list()
+        self.all_client_masking_data = list()
+        self.all_client_time = 0
 
     def load_seed_and_data_index(self, seed_list, all_data_index_list):
         """
@@ -55,14 +60,15 @@ class ClientManage:
 
     def generate_noise(self, count):
         # 为用户生成噪声
+        start_time = time.perf_counter()
         for i in range(params.K):
-            start_time = time.perf_counter()
             one_client_noise = list()
             for m in range(params.M):
                 one_client_noise_one_task = list()
                 one_client_noise_one_task_a = list()
                 # 使用第一个种子做处理
                 for k in range(params.K):
+                    count += 1
                     if m == 0 or k == 0:
                         random_noise_1 = Encrypt.random_prf(self.all_client_seed[i][0] + m + k + count)
                         one_client_noise_one_task_a.append(random_noise_1)
@@ -78,10 +84,9 @@ class ClientManage:
                 for k in range(params.K):
                     one_client_noise_one_task.append(one_client_noise_one_task_a[k] - one_client_noise_one_task_b[k])
                 one_client_noise.append(one_client_noise_one_task)
-            end_time = time.perf_counter()
-            self.all_client_time += (end_time - start_time) * 1000
-
             self.all_client_noise.append(one_client_noise)
+        end_time = time.perf_counter()
+        self.all_client_time += (end_time - start_time) * 1000
 
     def verify_noise_data(self):
         for m in range(params.M):

@@ -1,14 +1,18 @@
 edge_number = 10
-client_number = 200
-group_number_list = [20,20,20,20,20,20,20,20,20,20]
+client_number = 2000
+group_number_list = [200, 200, 200, 200, 200, 200, 200, 200, 200, 200]
 
 # datagenerate
 # 可靠程度,越接近100 越可靠
+base_data_rate = 10  # 随即生成地面真值之后乘以的倍数(更加分散)
+base_data_start = 1  # 随机生成地面真值的起点
+base_data_end = 1000  # 随机生成地面真值的终点
+reliable_client_rate = 99  # 可靠用户的比例,0-100 越接近100 可靠用户越多
 unreliable_start = 60
 unreliable_end = 70
 reliable_start = 90
 reliable_end = 99
-miss_rate = 1  #  用户掉线情况 1表示不缺失,越接近0 缺失越多
+miss_rate = 1  # 用户掉线情况 1表示不缺失,越接近0 缺失越多
 extreme_client_rate = 0  # 提交极端值的用户比率 越接近1 越多
 extreme_task_rate = 1  # 提交极端值的用户任务极端的比率 越接近1 越多
 error_rate = 3
@@ -21,7 +25,7 @@ extreme_data = 100000000
 
 # TD
 K = client_number
-M = 10
+M = 20
 count = 10
 
 # DH
@@ -30,7 +34,7 @@ q = None
 g = 2
 
 # noise
-select_index = 0 # 选择哪个边缘节点的随机向量
+select_index = 0  # 选择哪个边缘节点的随机向量
 client_noise = 0
 edge_masking_noise = 0
 edge_noise = 0

@@ -24,9 +24,22 @@ class EdgeManager:
     aggregation_and_upload_edge_time = list()
 
     def __init__(self):
-        self.masking = Masking(params.edge_number, params.M, params.K, params.masking_p)
+        self.public_key_edge_list = list()
+        self.private_key_edge_list = list()
+        self.aes_key_list_all_edge = list()
+        self.en_all_edge_client_data_index = list()
+        self.de_all_group_client_data_index = list()
+        self.all_group_in_client_data_index = list()
+        self.all_group_aggreagtion_client_data = list()
+        self.edge_masking_data_all_group = list()
+        self.all_group_masking_client_random_index = list()
+        self.masking = None
+        self.edge_seed_all = list()
+        self.masking_noise_all_edge = list()
         self.index_edge_time = list()
         self.aggregation_and_upload_edge_time = list()
+
+        self.masking = Masking(params.edge_number, params.M, params.K, params.masking_p)
         for edge_index in range(params.edge_number):
             self.index_edge_time.append(0)
             self.aggregation_and_upload_edge_time.append(0)
@@ -84,7 +97,8 @@ class EdgeManager:
         # 为所有边缘节点加密身生成的数据添加位置
         for edge_index1 in range(len(all_edge_client_data_index)):
             start_time = time.perf_counter()
-            en_one_edge_client_data_index = bytes()
+            # en_one_edge_client_data_index = bytes()
+            en_one_edge_client_data_index = list()
             one_edge_client_data_index = all_edge_client_data_index[edge_index1]
             start_index = 0
             end_index = 0
@@ -92,7 +106,7 @@ class EdgeManager:
             for edge_index2 in range(len(params.group_number_list)):
                 end_index += params.group_number_list[edge_index2]
                 temp_list = copy.copy(one_edge_client_data_index[start_index:end_index])
-                temp = Encrypt.aes_list_encryptor(self.aes_key_list_all_edge[edge_index1][edge_index2], temp_list)
+                temp = Encrypt.aes_list_encryptor_(self.aes_key_list_all_edge[edge_index1][edge_index2], temp_list)
                 en_one_edge_client_data_index += temp
                 start_index = end_index
             self.en_all_edge_client_data_index.append(en_one_edge_client_data_index)
@@ -114,7 +128,7 @@ class EdgeManager:
 
             start_time = time.perf_counter()
             self.de_all_group_client_data_index.append(
-                Encrypt.aes_list_decryptor(self.aes_key_list_all_edge[edge_index][edge_en_data_index], temp_list))
+                Encrypt.aes_list_decryptor_(self.aes_key_list_all_edge[edge_index][edge_en_data_index], temp_list))
             end_time = time.perf_counter()
             self.index_edge_time[edge_index] += (end_time - start_time) * 1000
 

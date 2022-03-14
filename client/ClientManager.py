@@ -17,6 +17,15 @@ class ClientManager:
     all_client_time = 0  # ms
 
     def __init__(self):
+        self.public_key_client_list = list()
+        self.private_key_client_list = list()
+        self.aes_key_list_all_group = list()
+        self.aes_key_with_cloud_list_all_group = list()
+        self.client_data_all_group = list()
+        self.client_ru_all_group = list()
+        self.client_encrypt_ru_all_group = list()
+        self.hash_noise_all_group = list()
+        self.all_client_time = 0  # ms
         print("init ClientManager")
 
     def generate_dh_key(self, client_count):

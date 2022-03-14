@@ -1,3 +1,4 @@
+import copy
 import time
 
 import params
@@ -20,6 +21,18 @@ class CloudServer:
     td_time = 0
 
     def __init__(self):
+        self.private_server_key = None
+        self.public_server_key = None
+        self.aes_key_list_with_client = None
+        self.anonymous_all_client_data = list()
+        self.td_result = list()
+        self.hash_noise_all_group = list()
+        self.hash_noise_others_group = list()
+        self.hash_noise_index = list()
+        self.cloud_server_aggreate_time = 0
+        self.cloud_server_generate_hash_noise_time = 0
+        self.extream_detection_time = 0
+        self.td_time = 0
         print("init CloudServer")
 
     def generate_dh_key(self):
@@ -81,7 +94,66 @@ class CloudServer:
                 hash_noise_all_group_one_task.append(noise)
             self.hash_noise_all_group.append(hash_noise_all_group_one_task)
         end_time = time.perf_counter()
+        print((end_time - start_time) * 1000)
         # 主要计算开销
+        self.cloud_server_generate_hash_noise_time += (end_time - start_time) * 1000
+
+    def generate_hash_noise_all_group_(self, client_encrypt_ru_all_group, data_miss_list_all_group):
+        """
+        云中心生成hash噪声
+        :param client_encrypt_ru_all_group:
+        :return:
+        """
+        start_time = time.perf_counter()
+        client_ru_all_group = list()
+        count = 0
+        for edge_index in range(params.edge_number):
+            client_ru_one_group = list()
+            for k in range(params.group_number_list[edge_index]):
+                client_ru_one_group.append(Encrypt.aes_decryptor(self.aes_key_list_with_client[count + k],
+                                                                 client_encrypt_ru_all_group[edge_index][k]))
+            count += params.group_number_list[edge_index]
+            client_ru_all_group.append(client_ru_one_group)
+
+        # 计算所有用户的hash_noise
+        hash_noise_all_task = list()
+        for m in range(params.M):
+            hash_noise_one_task = list()
+            for k in range(params.K):
+                hash_noise_one_task_index_i = list()
+                for edge_index in range(params.edge_number):
+                    hash_noise_one_task_index_i_edge = list()
+                    for i in range(params.group_number_list[edge_index]):
+                        count += 1
+                        temp = client_ru_all_group[edge_index][i] + k + m
+                        hash_noise_one_task_index_i_edge.append(Encrypt.hash_random(temp))
+                    hash_noise_one_task_index_i.append(hash_noise_one_task_index_i_edge)
+                hash_noise_one_task.append(hash_noise_one_task_index_i)
+            hash_noise_all_task.append(hash_noise_one_task)
+
+        # 计算云中心要用的noise
+        for m in range(params.M):
+            hash_noise_all_group_one_task = list()
+            for k in range(params.K):
+                noise = 0
+                for edge_index in range(params.edge_number):
+                    for client_index in range(params.group_number_list[edge_index]):
+                        # 删除未上传用户的数据
+                        if client_index not in data_miss_list_all_group[edge_index]:
+                            noise += hash_noise_all_task[m][k][edge_index][client_index]
+                hash_noise_all_group_one_task.append(noise)
+            self.hash_noise_all_group.append(hash_noise_all_group_one_task)
+
+        # 计算要发给每个边缘节点的noise
+        start_time1 = time.perf_counter()
+        for edge_index in range(params.edge_number):
+            hash_noise_one_group = copy.deepcopy(self.hash_noise_all_group)
+            for m in range(params.M):
+                for k in range(params.K):
+                    for client_index in range(params.group_number_list[edge_index]):
+                        hash_noise_one_group[m][k] -= hash_noise_all_task[m][k][edge_index][client_index]
+            self.hash_noise_others_group.append(hash_noise_one_group)
+        end_time = time.perf_counter()
         self.cloud_server_generate_hash_noise_time += (end_time - start_time) * 1000
 
     def aggregation_all_group_masking_client_random_index(self, all_group_masking_client_random_index):
@@ -124,6 +196,7 @@ class CloudServer:
         for k in range(len(self.anonymous_all_client_data)):
             for m in range(params.M):
                 if self.anonymous_all_client_data[k][m] == 0:
+                    print(self.anonymous_all_client_data[k])
                     extreme_data_list.append(self.anonymous_all_client_data[k])
                     break
                 if params.extreme_detection_flag:

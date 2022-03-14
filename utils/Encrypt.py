@@ -1,5 +1,6 @@
 import copy
 import hashlib
+import random
 import time
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -174,7 +175,7 @@ class Encrypt:
 # print(start_3-start_2)
 
 start = time.perf_counter()
-for i in range(1):
-    Encrypt.hash_random(1000000000)
+for i in range(100*100*10):
+    Encrypt.random_prf(1000000)
 end = time.perf_counter()
-# print(end-start)
+print((end-start)*1000)

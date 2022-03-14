@@ -35,7 +35,7 @@ class AnonymousEdgePPTD:
         start = time.perf_counter()  # 返回性能计数器的值（以小数秒为单位）作为浮点数
         self.clientManager.generate_dh_key(int(params.client_number))
         end = time.perf_counter()
-        print("为所有用户生成DH密钥用时%d" % (end - start))
+        # print("为所有用户生成DH密钥用时%d" % (end - start))
         # start = time.perf_counter()
         # self.clientManager.generate_aes_key()
         # end = time.perf_counter()
@@ -44,11 +44,11 @@ class AnonymousEdgePPTD:
         start = time.perf_counter()
         self.edgeManager.generate_dh_key(int(params.edge_number))
         end = time.perf_counter()
-        print("为所有边缘节点生成DH密钥用时%d" % (end - start))
+        # print("为所有边缘节点生成DH密钥用时%d" % (end - start))
         start = time.perf_counter()
         self.edgeManager.generate_aes_key()
         end = time.perf_counter()
-        print("为所有边缘节点生成协商对称密钥用时%d" % (end - start))
+        # print("为所有边缘节点生成协商对称密钥用时%d" % (end - start))
         self.edgeManager.generate_masking_seed()
         # 云中心生成dh密钥，并和用户相互生成aes密钥
         self.cloudServer.generate_dh_key()
@@ -56,11 +56,12 @@ class AnonymousEdgePPTD:
         self.cloudServer.generate_aes_key(self.clientManager.public_key_client_list)
         end = time.perf_counter()
         self.clientManager.generate_aes_key_with_cloud(self.cloudServer.public_server_key)
-        print("为所有用户和云中心协商对称密钥用时%d" % (end - start))
+        # print("为所有用户和云中心协商对称密钥用时%d" % (end - start))
 
     def data_generator(self):
         # 生成整个系统的用户数据
-        self.dataGenerator.generate_base_data(10, 0, 100, 99)
+        self.dataGenerator.generate_base_data(params.base_data_rate, params.base_data_start, params.base_data_end,
+                                              params.reliable_client_rate)
         # 打印basedata
         print("basedata")
         self.base_data_list = self.dataGenerator.base_data
@@ -121,12 +122,12 @@ class AnonymousEdgePPTD:
                                                              self.edgeManager.en_all_edge_client_data_index[
                                                                  edge_en_data_index])
         # 边缘节点总体数据添加位置
-        print("边缘节点总体数据添加位置")
-        print(self.edgeManager.de_all_group_client_data_index)
+        # print("边缘节点总体数据添加位置")
+        # print(self.edgeManager.de_all_group_client_data_index)
         # 各个边缘节点生成组内用户数据添加位置
         self.edgeManager.generate_in_group_client_data_index()
-        print("各边缘节点内部用户数据添加位置")
-        print(self.edgeManager.all_group_in_client_data_index)
+        # print("各边缘节点内部用户数据添加位置")
+        # print(self.edgeManager.all_group_in_client_data_index)
         # 边缘节点协商关于random_index要上传的向量
         self.edgeManager.generate_all_group_masking_client_random_index()
         return self.edgeManager.all_group_in_client_data_index
@@ -166,7 +167,7 @@ class AnonymousEdgePPTD:
         return self.clientManager.generate_update_data(all_group_in_client_data_index)
 
     def cloud_server_generate_hash_noise(self, client_encrypt_ru_all_group, data_miss_list_all_group):
-        self.cloudServer.generate_hash_noise_all_group(client_encrypt_ru_all_group, data_miss_list_all_group)
+        self.cloudServer.generate_hash_noise_all_group_(client_encrypt_ru_all_group, data_miss_list_all_group)
         return self.cloudServer.hash_noise_others_group
 
     def edge_aggregation_client_data(self, client_masking_data_all_group, data_miss_list_all_group):

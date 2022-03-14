@@ -11,7 +11,10 @@ class AS:
     td_time = 0
 
     def __init__(self):
-        pass
+        self.anonymous_all_client_data = list()
+        self.cloud_server_aggreate_time = 0
+        self.extream_detection_time = 0
+        self.td_time = 0
 
     def aggregation_masking_data_all_client(self, all_client_masking_data, data_miss_list_all_group):
         """

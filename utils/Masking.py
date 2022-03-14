@@ -18,6 +18,9 @@ class Masking:
         self.M = m
         self.K = k
         self.masking_p = masking_p
+        self.client_seed_all = list()
+        self.random_all_client = list()
+        self.masking_noise_all_client = list()
 
     def generate_seed_i_j(self, seed_start, seed_end):
         """

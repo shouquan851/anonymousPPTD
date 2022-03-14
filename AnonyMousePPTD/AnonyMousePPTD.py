@@ -1,3 +1,4 @@
+import params
 from AnonyMousePPTD.AS import AS
 from AnonyMousePPTD.ClientManage import ClientManage
 from AnonyMousePPTD.DR import DR
@@ -27,7 +28,8 @@ class AnonyMousePPTD:
 
     def data_generator_init(self):
         # 生成整个系统的用户数据
-        self.dataGenerator.generate_base_data(10, 0, 100, 99)
+        self.dataGenerator.generate_base_data(params.base_data_rate, params.base_data_start, params.base_data_end,
+                                              params.reliable_client_rate)
         # 打印basedata
         print("basedata")
         print(self.dataGenerator.base_data)
@@ -47,7 +49,7 @@ class AnonyMousePPTD:
         self.client_manager.generate_masking_data()
         return self.client_manager.all_client_masking_data
 
-    def as_aggregation_masking_data(self, all_client_masking_data, data_miss_list_all_group,data_section):
+    def as_aggregation_masking_data(self, all_client_masking_data, data_miss_list_all_group, data_section):
         self.AS.aggregation_masking_data_all_client(all_client_masking_data, data_miss_list_all_group)
         self.AS.detection_extreme_data(data_section)
         return self.AS.anonymous_all_client_data
