@@ -66,17 +66,13 @@ class AnonymousEdgePPTD:
         print("basedata")
         self.base_data_list = self.dataGenerator.base_data
         print(self.dataGenerator.base_data)
-        # 计算极端值检测区间
-        for base_data in self.dataGenerator.base_data:
-            data_section_one_task = list()
-            data_section_one_task.append(base_data * params.extreme_detection_small_rate)
-            data_section_one_task.append(base_data * params.extreme_detection_big_rate)
-            self.data_section.append(data_section_one_task)
-
         self.dataGenerator.generate_client_data()
         self.all_client_data = self.dataGenerator.all_client_data
         self.origin_client_data = copy.deepcopy(self.all_client_data)
         return self.all_client_data
+
+    def generate_datection_section(self):
+        self.dataGenerator.generate_datection_section()
 
     def generate_extreme_data_index(self, k, m, extreme_client_rate, extreme_task_rate):
         extreme_data_index = list()

@@ -68,7 +68,6 @@ class ClientManage:
                 one_client_noise_one_task_a = list()
                 # 使用第一个种子做处理
                 for k in range(params.K):
-                    count += 1
                     if m == 0 or k == 0:
                         random_noise_1 = Encrypt.random_prf(self.all_client_seed[i][0] + m + k + count)
                         one_client_noise_one_task_a.append(random_noise_1)

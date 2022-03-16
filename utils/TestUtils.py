@@ -22,7 +22,7 @@ class TestUtils:
         # 导入CSV安装包
 
         # 1. 创建文件对象
-        f = open(file_path+file_name, 'w', encoding='utf-8')
+        f = open(file_path+file_name, 'w', encoding='utf-8',newline='')
 
         # 2. 基于文件对象构建 csv写入对象
         csv_writer = csv.writer(f)

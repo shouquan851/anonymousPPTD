@@ -98,14 +98,14 @@ class Encrypt:
     @staticmethod
     def hash_random(plaintext: int):
         # hex_temp = hashlib.sha1(bytes(plaintext)).hexdigest()[0:5]
-        hex_temp = hashlib.sha1(plaintext.to_bytes(4, byteorder='big')).hexdigest()[0:5]
+        hex_temp = hashlib.md5(plaintext.to_bytes(4, byteorder='big')).hexdigest()[0:5]
         temp = Encrypt.hashCode(hex_temp)
         return temp
 
     @staticmethod
     def random_prf(seed):
         # hex_temp = hashlib.sha1(bytes(seed)).hexdigest()
-        hex_temp = hashlib.sha1(seed.to_bytes(4, byteorder='big')).hexdigest()
+        hex_temp = hashlib.md5(seed.to_bytes(4, byteorder='big')).hexdigest()
         temp = Encrypt.hashCode(hex_temp)
         return temp % params.prf_p
 

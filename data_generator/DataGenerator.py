@@ -7,11 +7,13 @@ class DataGenerator:
     base_data = list()
     reliable_client = list()
     all_client_data = list()
+    data_section = list()
 
     def __init__(self):
         self.base_data = list()
         self.reliable_client = list()
         self.all_client_data = list()
+        self.data_section = list()
         print("init DataGenerator")
 
     def generate_base_data(self, base_data_rate, base_data_start, base_data_end, reliable_client_rate):
@@ -46,3 +48,11 @@ class DataGenerator:
             all_client_data.append(one_client_data)
         self.all_client_data = all_client_data
         return self.all_client_data
+
+    def generate_datection_section(self):
+        # 计算极端值检测区间
+        for base_data in self.base_data:
+            data_section_one_task = list()
+            data_section_one_task.append(base_data * params.extreme_detection_small_rate)
+            data_section_one_task.append(base_data * params.extreme_detection_big_rate)
+            self.data_section.append(data_section_one_task)
