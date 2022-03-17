@@ -228,8 +228,8 @@ def run_test_computation():
 
 def run_test_accuracy():
     extreme_client_number = 0
-    test_result_list = list()
-    test_result_list.append(["K", "extreme_client_rate", "TD_RMSE", "Outlier_RMSE", "ODPPTD_RMSE", "AN_RMSE"])
+    TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/", "test_accuracy_result.csv",
+                                 ["K", "extreme_client_rate", "TD_RMSE", "Outlier_RMSE", "ODPPTD_RMSE", "AN_RMSE"])
     # 生成原始数据和极端值检测区间
     dataGenerator = DataGenerator()
     dataGenerator.generate_base_data(params.base_data_rate, params.base_data_start, params.base_data_end,
@@ -237,11 +237,11 @@ def run_test_accuracy():
     dataGenerator.generate_client_data()
     dataGenerator.generate_datection_section()
 
-    for i in range(20):
+    for i in range(10):
         print("开始第%d轮：-------------------------" % (i))
         # 初始化参数
         params.extreme_client_rate = extreme_client_number / 1000
-        extreme_client_number += 10
+        extreme_client_number += 20
 
         # 初始化
         anonymousEdgePPTD = AnonymousEdgePPTD()
@@ -344,11 +344,10 @@ def run_test_accuracy():
         # print("one client_time = %f" % (anonyMousePPTD.client_manager.all_client_time / params.client_number))
         # print("cloud_server_aggreate_time=%f" % anonyMousePPTD.AS.cloud_server_aggreate_time)
         #
-        test_result_list.append(
-            [params.K, params.extreme_client_rate, TD_original_RMSE, TD_Outlier_RMSE, ODPPTD_Outlier_RMSE,
-             AN_Outlier_RMSE])
-    TestUtils.write_csv("D:/workPlace/researchRecord/anonymousPPTD/testResult/", "test_accuracy_result.csv",
-                        test_result_list)
+        TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/", "test_accuracy_result.csv",
+                                     [params.K, params.extreme_client_rate, TD_original_RMSE, TD_Outlier_RMSE,
+                                      ODPPTD_Outlier_RMSE,
+                                      AN_Outlier_RMSE])
 
 
 # run_once()

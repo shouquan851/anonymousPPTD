@@ -22,7 +22,7 @@ class TestUtils:
         # 导入CSV安装包
 
         # 1. 创建文件对象
-        f = open(file_path+file_name, 'w', encoding='utf-8',newline='')
+        f = open(file_path + file_name, 'w', encoding='utf-8', newline='')
 
         # 2. 基于文件对象构建 csv写入对象
         csv_writer = csv.writer(f)
@@ -41,4 +41,30 @@ class TestUtils:
         # 5. 关闭文件
         f.close()
 
-# TestUtils.write_csv("D:/workPlace/researchRecord/anonymousPPTD/testResult/","测试结果.csv",None)
+    @staticmethod
+    def write_csv_one_line(file_path, file_name, data_list):
+        # !/usr/bin/python3
+        # -*- coding: utf-8 -*-
+
+        # 导入CSV安装包
+
+        # 1. 创建文件对象
+        f = open(file_path + file_name, 'a+', encoding='utf-8', newline='')
+
+        # 2. 基于文件对象构建 csv写入对象
+        csv_writer = csv.writer(f)
+        csv_writer.writerow(data_list)
+
+        # # 3. 构建列表头
+        # csv_writer.writerow(["姓名", "年龄", "性别"])
+        #
+        # # 4. 写入csv文件内容
+        # csv_writer.writerow(["l", '18', '男'])
+        # csv_writer.writerow(["c", '20', '男'])
+        # csv_writer.writerow(["w", '22', '女'])
+
+        # 5. 关闭文件
+        f.close()
+
+
+TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/", "测试结果.csv", [1, 2, 3, 4, 5])
