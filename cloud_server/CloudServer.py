@@ -205,6 +205,7 @@ class CloudServer:
                         extreme_data_list.append(self.anonymous_all_client_data[k])
                         break
         for extreme_data in extreme_data_list:
+            print(extreme_data)
             self.anonymous_all_client_data.remove(extreme_data)
         end_time = time.perf_counter()
         self.extream_detection_time += (end_time - start_time) * 1000

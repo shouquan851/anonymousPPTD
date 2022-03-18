@@ -16,19 +16,20 @@ reliable_start = 90
 reliable_end = 99
 miss_rate = 1000/1000  # 用户掉线情况 1表示不缺失,越接近0 缺失越多
 extreme_client_rate = 0/1000  # 提交极端值的用户比率 越接近1 越多
+extreme_client_number = 0  # 提交极端值的用户个数
 extreme_task_rate = 1  # 提交极端值的用户任务极端的比率 越接近1 越多
 error_rate = 3
 spite_client_vs_error_client = 1000  # 恶意用户和传感器偏差的可能 该数值越大,则越有可能是恶意用户
 extreme_detection_flag = True  # 是否进行极端值检测
 extreme_detection_flag_ = True  # 对比方案是否进行极端值检测
-extreme_detection_small_rate = 0.5
-extreme_detection_big_rate = 1.5
+extreme_detection_small_rate = 0.1
+extreme_detection_big_rate = 2.5
 extreme_data = 100000000
 
 # TD
 K = client_number
 M = 50
-count = 100
+count = 50
 
 # DH
 p = 9584766362985668998675320225938492576833127437546441475200651386681661214949815198902067575999636607649757091547852460848597727186027733861209248123986003

@@ -94,6 +94,30 @@ class AnonymousEdgePPTD:
             extreme_data_index.append(extreme_data_index_one_cliet)
         self.extreme_data_index = extreme_data_index
 
+    def generate_extreme_data_index_(self, k, m, extreme_client_rate, extreme_task_rate):
+        extreme_data_index = list()
+        for k_ in range(k):
+            extreme_data_index_one_cliet = list()
+            if extreme_client_rate > 0:
+                for m_ in range(m):
+                    extreme_data_index_one_cliet.append(0)
+                if random.randrange(0, 1000) < params.spite_client_vs_error_client:
+                    # 是恶意用户
+                    for m_ in range(int(m * extreme_task_rate)):
+                        # extreme_data_index_one_cliet.append(1)
+                        extreme_data_index_one_cliet[random.randrange(0, m)] = 1
+                else:
+                    # 是传感器偏差
+                    for m_ in range(int(m * extreme_task_rate)):
+                        # extreme_data_index_one_cliet.append(2)
+                        extreme_data_index_one_cliet[random.randrange(0, m)] = 2
+                extreme_client_rate -= 1
+            else:
+                for m_ in range(m):
+                    extreme_data_index_one_cliet.append(0)
+            extreme_data_index.append(extreme_data_index_one_cliet)
+        self.extreme_data_index = extreme_data_index
+
     def add_extreme_data(self):
         for k in range(params.K):
             for m in range(params.M):

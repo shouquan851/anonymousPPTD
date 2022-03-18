@@ -18,7 +18,7 @@ def run_once():
     anonymousEdgePPTD.generate_datection_section()
 
     # 添加极端值
-    anonymousEdgePPTD.generate_extreme_data_index(params.K, params.M, params.extreme_client_rate,
+    anonymousEdgePPTD.generate_extreme_data_index_(params.K, params.M, params.extreme_client_rate,
                                                   params.extreme_task_rate)
     anonymousEdgePPTD.add_extreme_data()
 
@@ -128,7 +128,7 @@ def run_test_computation():
         anonymousEdgePPTD.generate_datection_section()
 
         # 添加极端值
-        anonymousEdgePPTD.generate_extreme_data_index(params.K, params.M, params.extreme_client_rate,
+        anonymousEdgePPTD.generate_extreme_data_index_(params.K, params.M, params.extreme_client_rate,
                                                       params.extreme_task_rate)
         anonymousEdgePPTD.add_extreme_data()
 
@@ -227,7 +227,7 @@ def run_test_computation():
 
 
 def run_test_accuracy():
-    extreme_client_number = 0
+    params.extreme_client_number = 0
     TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/", "test_accuracy_result.csv",
                                  ["K", "extreme_client_rate", "TD_RMSE", "Outlier_RMSE", "ODPPTD_RMSE", "AN_RMSE"])
     # 生成原始数据和极端值检测区间
@@ -237,11 +237,10 @@ def run_test_accuracy():
     dataGenerator.generate_client_data()
     dataGenerator.generate_datection_section()
 
-    for i in range(10):
+    for i in range(20):
         print("开始第%d轮：-------------------------" % (i))
         # 初始化参数
-        params.extreme_client_rate = extreme_client_number / 1000
-        extreme_client_number += 20
+        params.extreme_client_number += 1
 
         # 初始化
         anonymousEdgePPTD = AnonymousEdgePPTD()
@@ -249,13 +248,14 @@ def run_test_accuracy():
         anonymousEdgePPTD.key_agreement()
         # 调整数据生成器
         anonymousEdgePPTD.base_data_list = dataGenerator.base_data
+        print(dataGenerator.base_data)
         # anonymousEdgePPTD.dataGenerator.reliable_client = dataGenerator.reliable_client
         # anonymousEdgePPTD.dataGenerator.all_client_data =copy.deepcopy( dataGenerator.all_client_data)
         anonymousEdgePPTD.data_section = dataGenerator.data_section
         anonymousEdgePPTD.origin_client_data = copy.deepcopy(dataGenerator.all_client_data)
         anonymousEdgePPTD.all_client_data = copy.deepcopy(dataGenerator.all_client_data)
         # 添加极端值
-        anonymousEdgePPTD.generate_extreme_data_index(params.K, params.M, params.extreme_client_rate,
+        anonymousEdgePPTD.generate_extreme_data_index_(params.K, params.M, params.extreme_client_number,
                                                       params.extreme_task_rate)
         anonymousEdgePPTD.add_extreme_data()
 
@@ -322,7 +322,6 @@ def run_test_accuracy():
                                                                                anonymousEdgePPTD.data_section)
         td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
         print("真值发现结果")
-        print(td_result_anonymous_all_client_data)
         AN_Outlier_RMSE = TestUtils.get_RMSE(td_result_anonymous_all_client_data, anonymousEdgePPTD.base_data_list)
         print("对比方案RMSE = %f" % AN_Outlier_RMSE)
 
