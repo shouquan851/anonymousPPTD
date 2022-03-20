@@ -50,9 +50,13 @@ class AS:
                 if self.anonymous_all_client_data[k][m] == 0:
                     extreme_data_list.append(self.anonymous_all_client_data[k])
                     break
+                # if params.extreme_detection_flag_:
+                #     if self.anonymous_all_client_data[k][m] < data_section[m][0] or data_section[m][1] < \
+                #             self.anonymous_all_client_data[k][m]:
+                #         extreme_data_list.append(self.anonymous_all_client_data[k])
+                #         break
                 if params.extreme_detection_flag_:
-                    if self.anonymous_all_client_data[k][m] < data_section[m][0] or data_section[m][1] < \
-                            self.anonymous_all_client_data[k][m]:
+                    if self.anonymous_all_client_data[k][m] > params.extreme_data:
                         extreme_data_list.append(self.anonymous_all_client_data[k])
                         break
         for extreme_data in extreme_data_list:

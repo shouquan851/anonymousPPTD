@@ -1,4 +1,5 @@
 import copy
+import random
 import time
 
 import params
@@ -19,6 +20,7 @@ class CloudServer:
     cloud_server_generate_hash_noise_time = 0
     extream_detection_time = 0
     td_time = 0
+    cloud_server_r = list()
 
     def __init__(self):
         self.private_server_key = None
@@ -33,6 +35,7 @@ class CloudServer:
         self.cloud_server_generate_hash_noise_time = 0
         self.extream_detection_time = 0
         self.td_time = 0
+        self.cloud_server_r = list()
         print("init CloudServer")
 
     def generate_dh_key(self):
@@ -54,6 +57,11 @@ class CloudServer:
         :return:
         """
         start_time = time.perf_counter()
+        for m in range(params.M):
+            cloud_server_r_one_task = list()
+            for k in range(params.K):
+                cloud_server_r_one_task.append(random.randrange(params.ru_start,params.ru_end))
+            self.cloud_server_r.append(cloud_server_r_one_task)
         client_ru_all_group = list()
         count = 0
         for edge_index in range(params.edge_number):
@@ -77,7 +85,7 @@ class CloudServer:
                                 if client_index not in data_miss_list_all_group[edge_index2]:
                                     temp = client_ru_all_group[edge_index2][client_index] + k + m
                                     noise += Encrypt.hash_random(temp)
-                    hash_noise_one_group_one_task.append(noise)
+                    hash_noise_one_group_one_task.append(noise+self.cloud_server_r[m][k])
                 hash_noise_one_group.append(hash_noise_one_group_one_task)
             self.hash_noise_others_group.append(hash_noise_one_group)
 
@@ -91,7 +99,7 @@ class CloudServer:
                         if client_index not in data_miss_list_all_group[edge_index]:
                             temp = client_ru_all_group[edge_index][client_index] + k + m
                             noise += Encrypt.hash_random(temp)
-                hash_noise_all_group_one_task.append(noise)
+                hash_noise_all_group_one_task.append(noise+self.cloud_server_r[m][k])
             self.hash_noise_all_group.append(hash_noise_all_group_one_task)
         end_time = time.perf_counter()
         print((end_time - start_time) * 1000)
@@ -151,7 +159,8 @@ class CloudServer:
             for m in range(params.M):
                 for k in range(params.K):
                     for client_index in range(params.group_number_list[edge_index]):
-                        hash_noise_one_group[m][k] -= hash_noise_all_task[m][k][edge_index][client_index]
+                        if client_index not in data_miss_list_all_group[edge_index]:
+                            hash_noise_one_group[m][k] -= hash_noise_all_task[m][k][edge_index][client_index]
             self.hash_noise_others_group.append(hash_noise_one_group)
         end_time = time.perf_counter()
         self.cloud_server_generate_hash_noise_time += (end_time - start_time) * 1000
@@ -196,7 +205,7 @@ class CloudServer:
         for k in range(len(self.anonymous_all_client_data)):
             for m in range(params.M):
                 if self.anonymous_all_client_data[k][m] == 0:
-                    print(self.anonymous_all_client_data[k])
+                    # print(self.anonymous_all_client_data[k])
                     extreme_data_list.append(self.anonymous_all_client_data[k])
                     break
                 if params.extreme_detection_flag:
@@ -205,7 +214,7 @@ class CloudServer:
                         extreme_data_list.append(self.anonymous_all_client_data[k])
                         break
         for extreme_data in extreme_data_list:
-            print(extreme_data)
+            # print(extreme_data)
             self.anonymous_all_client_data.remove(extreme_data)
         end_time = time.perf_counter()
         self.extream_detection_time += (end_time - start_time) * 1000

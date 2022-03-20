@@ -1,6 +1,9 @@
+import copy
+import csv
 import random
 
 import params
+from utils.TestUtils import TestUtils
 
 
 class DataGenerator:
@@ -56,3 +59,18 @@ class DataGenerator:
             data_section_one_task.append(base_data * params.extreme_detection_small_rate)
             data_section_one_task.append(base_data * params.extreme_detection_big_rate)
             self.data_section.append(data_section_one_task)
+
+    def sava_all_client_data(self, file_path, file_name):
+        TestUtils.write_csv_one_line_title(file_path, file_name, self.base_data)
+        for client_data in self.all_client_data:
+            TestUtils.write_csv_one_line(file_path, file_name, client_data)
+
+    def read_all_client_data(self, file_path, file_name):
+        with open(file_path + file_name, 'r', encoding='utf8') as fp:
+            temp_list = [i for i in csv.reader(fp)]
+            for i in range(len(temp_list)):
+                for j in range(len(temp_list[0])):
+                    temp_list[i][j] = float(temp_list[i][j])
+            self.base_data = copy.copy(temp_list[0])
+            temp_list.remove(temp_list[0])
+            self.all_client_data = temp_list

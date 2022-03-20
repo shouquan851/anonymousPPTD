@@ -62,17 +62,20 @@ class AnonymousEdgePPTD:
         # 生成整个系统的用户数据
         self.dataGenerator.generate_base_data(params.base_data_rate, params.base_data_start, params.base_data_end,
                                               params.reliable_client_rate)
+        self.dataGenerator.generate_client_data()
+
+    def load_data(self):
         # 打印basedata
         print("basedata")
         self.base_data_list = self.dataGenerator.base_data
         print(self.dataGenerator.base_data)
-        self.dataGenerator.generate_client_data()
         self.all_client_data = self.dataGenerator.all_client_data
         self.origin_client_data = copy.deepcopy(self.all_client_data)
         return self.all_client_data
 
     def generate_datection_section(self):
         self.dataGenerator.generate_datection_section()
+        self.data_section = self.dataGenerator.data_section
 
     def generate_extreme_data_index(self, k, m, extreme_client_rate, extreme_task_rate):
         extreme_data_index = list()
@@ -176,6 +179,22 @@ class AnonymousEdgePPTD:
         self.data_miss_list_all_group = data_miss_list_all_group
         return data_miss_list_all_group
 
+    def generate_data_miss_list_(self, rate):
+        """
+        生成掉线用户的索引
+        :param number:
+        :return:
+        """
+        data_miss_list_all_group = list()
+        for edge_index in range(params.edge_number):
+            data_miss_list_one_group = list()
+            temp = params.group_number_list[edge_index]
+            for k in range(int(temp * rate)):
+                data_miss_list_one_group.append(random.randrange(0, temp))
+            data_miss_list_all_group.append(data_miss_list_one_group)
+        self.data_miss_list_all_group = data_miss_list_all_group
+        return data_miss_list_all_group
+
     def client_upload_data(self, all_group_in_client_data_index, de_all_group_client_data_index):
         # 用户生成ru
         self.clientManager.generate_ru()
@@ -205,6 +224,20 @@ class AnonymousEdgePPTD:
             self.edgeManager.all_group_masking_client_random_index)
         # 聚合用户数据
         self.cloudServer.aggregation_edge_masking_data_all_group(edge_masking_data_all_group)
+        # 检测极端值
+        self.cloudServer.detection_extreme_data(data_section)
+        return self.cloudServer.anonymous_all_client_data
+
+    def cloud_server_aggregation_edge_masking_data_(self, data_miss_list_all_group, anonymous_all_client_data,
+                                                    data_section):
+        for edge_index in range(params.edge_number):
+            if (len(data_miss_list_all_group[edge_index]) == 0):
+                continue
+            for i in range(data_miss_list_all_group[edge_index]):
+                anonymous_all_client_data.remove(
+                    anonymous_all_client_data[edge_index * (params.K / params.edge_number) + i])
+        self.cloudServer.anonymous_all_client_data = anonymous_all_client_data
+
         # 检测极端值
         self.cloudServer.detection_extreme_data(data_section)
         return self.cloudServer.anonymous_all_client_data

@@ -66,5 +66,12 @@ class TestUtils:
         # 5. 关闭文件
         f.close()
 
+    @staticmethod
+    def write_csv_one_line_title(file_path, file_name, data_list):
+        f = open(file_path + file_name, 'a', encoding='utf-8', newline='')
+        csv_writer = csv.writer(f)
+        csv_writer.writerow(data_list)
+        f.close()
+
 
 TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/", "测试结果.csv", [1, 2, 3, 4, 5])

@@ -3,6 +3,7 @@ import hashlib
 import random
 import time
 
+import numpy as numpy
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import dh
@@ -97,6 +98,13 @@ class Encrypt:
 
     @staticmethod
     def hash_random(plaintext: int):
+        # hex_temp = hashlib.md5(bytes(plaintext)).hexdigest()[0:5]
+        hex_temp = hashlib.md5(plaintext.to_bytes(4, byteorder='big')).hexdigest()[0:5]  # 更快
+        temp = Encrypt.hashCode(hex_temp)
+        return temp
+
+    @staticmethod
+    def hash_random_(plaintext: int):
         # hex_temp = hashlib.sha1(bytes(plaintext)).hexdigest()[0:5]
         hex_temp = hashlib.md5(plaintext.to_bytes(4, byteorder='big')).hexdigest()[0:5]
         temp = Encrypt.hashCode(hex_temp)
@@ -174,8 +182,14 @@ class Encrypt:
 # print(start_2-start_1)
 # print(start_3-start_2)
 
-start = time.perf_counter()
-for i in range(100*100*10):
-    Encrypt.random_prf(1000000)
-end = time.perf_counter()
-print((end-start)*1000)
+# start = time.perf_counter()
+# for i in range(100):
+#     Encrypt.hash_random(1000000)
+# end = time.perf_counter()
+# print((end - start) * 1000)
+#
+# start = time.perf_counter()
+# for i in range(100):
+#     Encrypt.hash_random_(1000000)
+# end = time.perf_counter()
+# print((end - start) * 1000)
