@@ -343,6 +343,6 @@ def run_test_accuracy():
                                       AN_Outlier_RMSE])
 
 
-# run_once()
+run_once()
 # run_test_computation()
-run_test_accuracy()
+# run_test_accuracy()

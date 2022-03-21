@@ -206,7 +206,7 @@ class AnonymousEdgePPTD:
         return self.clientManager.generate_update_data(all_group_in_client_data_index)
 
     def cloud_server_generate_hash_noise(self, client_encrypt_ru_all_group, data_miss_list_all_group):
-        self.cloudServer.generate_hash_noise_all_group_(client_encrypt_ru_all_group, data_miss_list_all_group)
+        self.cloudServer.generate_hash_noise_all_group__(client_encrypt_ru_all_group, data_miss_list_all_group)
         return self.cloudServer.hash_noise_others_group
 
     def edge_aggregation_client_data(self, client_masking_data_all_group, data_miss_list_all_group):
