@@ -230,12 +230,14 @@ class AnonymousEdgePPTD:
 
     def cloud_server_aggregation_edge_masking_data_(self, data_miss_list_all_group, anonymous_all_client_data,
                                                     data_section):
+        count = 0
         for edge_index in range(params.edge_number):
             if (len(data_miss_list_all_group[edge_index]) == 0):
                 continue
-            for i in range(data_miss_list_all_group[edge_index]):
+            for i in data_miss_list_all_group[edge_index]:
                 anonymous_all_client_data.remove(
-                    anonymous_all_client_data[edge_index * (params.K / params.edge_number) + i])
+                    anonymous_all_client_data[int(edge_index * (params.K / params.edge_number) + i - count)])
+                count += 1
         self.cloudServer.anonymous_all_client_data = anonymous_all_client_data
 
         # 检测极端值

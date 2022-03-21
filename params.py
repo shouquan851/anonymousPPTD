@@ -24,9 +24,13 @@ error_rate = 3
 spite_client_vs_error_client = 0  # 恶意用户和传感器偏差的可能 该数值越大,则越有可能是恶意用户
 extreme_detection_flag = True  # 是否进行极端值检测
 extreme_detection_flag_ = True  # 对比方案是否进行极端值检测
+extreme_detection_flag_no = True  # 是否进行非先验检测
+alpha = 1.5 # 非先验知识检测强度
 extreme_detection_small_rate = 0.1
 extreme_detection_big_rate = 2.5
 extreme_data = 1000000
+
+
 
 # TD
 K = client_number

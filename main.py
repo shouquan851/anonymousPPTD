@@ -287,10 +287,11 @@ def run_test_accuracy():
         # edge_masking_data_all_group = anonymousEdgePPTD.edge_generate_edge_masking_data_all_group(
         #     hash_noise_others_group,2)
 
+        temp_client_data = copy.deepcopy(anonymousEdgePPTD.all_client_data)
         # 准确率测试专用
         anonymous_all_client_data = anonymousEdgePPTD.cloud_server_aggregation_edge_masking_data_(
             data_miss_list_all_group,
-            anonymousEdgePPTD.all_client_data
+            temp_client_data
             , anonymousEdgePPTD.data_section)
 
         print("*************************开始进行真值发现,并计算准确率********************************")
@@ -303,7 +304,7 @@ def run_test_accuracy():
         print("直接TD的RMSE = %f" % TD_original_RMSE)
 
         # 对有离群值数据做TD
-        td_result_original_data = anonymousEdgePPTD.original_data_TD(anonymousEdgePPTD.all_client_data)
+        td_result_original_data = anonymousEdgePPTD.original_data_TD(temp_client_data)
         print("有离群值数据直接真值发现结果")
         print(td_result_original_data)
         TD_Outlier_RMSE = TestUtils.get_RMSE(td_result_original_data, anonymousEdgePPTD.base_data_list)
