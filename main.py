@@ -44,8 +44,10 @@ def run_once():
     edge_masking_data_all_group = anonymousEdgePPTD.edge_generate_edge_masking_data_all_group(hash_noise_others_group,
                                                                                               2)
     # 云中心聚合数据
-    anonymous_all_client_data = anonymousEdgePPTD.cloud_server_aggregation_edge_masking_data(
-        edge_masking_data_all_group, anonymousEdgePPTD.data_section)
+    anonymousEdgePPTD.cloud_server_aggregation_edge_masking_data(
+        edge_masking_data_all_group)
+    # 检测极端值
+    anonymous_all_client_data = anonymousEdgePPTD.cloud_server_detection_extreme_data(anonymousEdgePPTD.data_section)
 
     print("***********************************************************************")
     print("开始进行真值发现")
@@ -110,7 +112,7 @@ def run_test_computation():
         ["K", "ODPPTD_one_client_time", "ODPPTD_index_edge_time", "ODPPTD_aggregation_and_upload_edge_time",
          "ODPPTD_cloud_server_aggreate_time", "ODPPTD_cloud_server_generate_hash_noise_time",
          "one_client_time", "cloud_server_aggreate_time"])
-    for i in range(10):
+    for i in range(20):
         print("开始第%d轮：-------------------------" % (i))
         # 初始化参数
         params.K += 100
@@ -155,9 +157,13 @@ def run_test_computation():
         edge_masking_data_all_group = anonymousEdgePPTD.edge_generate_edge_masking_data_all_group(
             hash_noise_others_group,
             2)
+
         # 云中心聚合数据
-        anonymous_all_client_data = anonymousEdgePPTD.cloud_server_aggregation_edge_masking_data(
-            edge_masking_data_all_group, anonymousEdgePPTD.data_section)
+        anonymousEdgePPTD.cloud_server_aggregation_edge_masking_data(
+            edge_masking_data_all_group)
+        # 检测极端值
+        anonymous_all_client_data = anonymousEdgePPTD.cloud_server_detection_extreme_data(
+            anonymousEdgePPTD.data_section)
 
         print("***********************************************************************")
         print("开始进行真值发现")
@@ -343,6 +349,6 @@ def run_test_accuracy():
                                       AN_Outlier_RMSE])
 
 
-run_once()
-# run_test_computation()
+# run_once()
+run_test_computation()
 # run_test_accuracy()

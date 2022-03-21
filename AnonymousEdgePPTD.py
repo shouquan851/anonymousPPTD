@@ -7,6 +7,7 @@ from client.ClientManager import ClientManager
 from cloud_server.CloudServer import CloudServer
 from data_generator.DataGenerator import DataGenerator
 from edge_server.EdgeManager import EdgeManager
+from utils.DetectOutliers import DetectOutliers
 from utils.TD_CRH import TD_CRH
 
 
@@ -218,14 +219,21 @@ class AnonymousEdgePPTD:
         self.edgeManager.generate_edge_masking_data_all_group(hash_noise_others_group)
         return self.edgeManager.edge_masking_data_all_group
 
-    def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group, data_section):
+    def cloud_server_aggregation_edge_masking_data(self, edge_masking_data_all_group):
         # 聚合hash噪声的位置
         self.cloudServer.aggregation_all_group_masking_client_random_index(
             self.edgeManager.all_group_masking_client_random_index)
         # 聚合用户数据
         self.cloudServer.aggregation_edge_masking_data_all_group(edge_masking_data_all_group)
+
+    def cloud_server_detection_extreme_data(self, data_section):
         # 检测极端值
+        # 生成检测区间
+        data_section_sifenwei = DetectOutliers.detect_outliers(self.cloudServer.anonymous_all_client_data,params.alpha)
+        print("data_section_sifenwei")
+        print(data_section_sifenwei)
         self.cloudServer.detection_extreme_data(data_section)
+        self.cloudServer.detection_extreme_data(data_section_sifenwei)
         return self.cloudServer.anonymous_all_client_data
 
     def cloud_server_aggregation_edge_masking_data_(self, data_miss_list_all_group, anonymous_all_client_data,

@@ -3,6 +3,7 @@ from AnonyMousePPTD.AS import AS
 from AnonyMousePPTD.ClientManage import ClientManage
 from AnonyMousePPTD.DR import DR
 from data_generator.DataGenerator import DataGenerator
+from utils.DetectOutliers import DetectOutliers
 
 
 class AnonyMousePPTD:
@@ -51,7 +52,11 @@ class AnonyMousePPTD:
 
     def as_aggregation_masking_data(self, all_client_masking_data, data_miss_list_all_group, data_section):
         self.AS.aggregation_masking_data_all_client(all_client_masking_data, data_miss_list_all_group)
-        self.AS.detection_extreme_data(data_section)
+        # 生成检测区间
+        data_section_sifenwei = DetectOutliers.detect_outliers(self.AS.anonymous_all_client_data, params.alpha)
+        print("data_section_sifenwei")
+        print(data_section_sifenwei)
+        self.AS.detection_extreme_data(data_section_sifenwei)
         return self.AS.anonymous_all_client_data
 
     def as_td(self, anonymous_all_client_data):

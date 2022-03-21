@@ -3,6 +3,7 @@ import random
 import time
 
 import params
+from utils.DetectOutliers import DetectOutliers
 from utils.Encrypt import Encrypt
 from utils.TD_CRH import TD_CRH
 
@@ -175,6 +176,7 @@ class CloudServer:
         :param client_encrypt_ru_all_group:
         :return:
         """
+        start_time = time.perf_counter()
         client_ru_all_group = list()
         count = 0
         # 解密ru
@@ -208,6 +210,8 @@ class CloudServer:
                         self.cloud_server_r_list[m][index] - hash_noise_one_group_one_task_one_index)
                 hash_noise_one_group.append(hash_noise_one_group_one_task)
             self.hash_noise_others_group.append(hash_noise_one_group)
+        end_time = time.perf_counter()
+        self.cloud_server_generate_hash_noise_time += (end_time - start_time) * 1000
 
     def aggregation_all_group_masking_client_random_index(self, all_group_masking_client_random_index):
         """
