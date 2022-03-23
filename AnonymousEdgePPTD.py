@@ -28,6 +28,12 @@ class AnonymousEdgePPTD:
         self.edgeManager = EdgeManager()
         self.cloudServer = CloudServer()
         self.dataGenerator = DataGenerator()
+        self.base_data_list = list()
+        self.extreme_data_index = list()
+        self.data_miss_list_all_group = list()
+        self.all_client_data = list()
+        self.origin_client_data = list()
+        self.data_section = list()
         print("init Application")
 
     def key_agreement(self):

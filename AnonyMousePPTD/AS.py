@@ -16,19 +16,12 @@ class AS:
         self.extream_detection_time = 0
         self.td_time = 0
 
-    def aggregation_masking_data_all_client(self, all_client_masking_data, data_miss_list_all_group):
+    def aggregation_masking_data_all_client(self, all_client_masking_data, data_miss_list):
         """
         中心服务器聚合用户数据
         :param all_client_masking_data:
         :return:
         """
-        data_miss_list = list()
-        count = 0
-        for edge_index in range(len(data_miss_list_all_group)):
-            for miss_index in data_miss_list_all_group[edge_index]:
-                data_miss_list.append(count + miss_index)
-            count += params.group_number_list[edge_index]
-
         start_time = time.perf_counter()
         for k in range(params.K):
             anonymous_one_client_data = list()

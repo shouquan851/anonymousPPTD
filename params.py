@@ -1,8 +1,8 @@
 edge_number = 10
-# client_number = 1000
-# group_number_list = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
-client_number = 100
-group_number_list = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+client_number = 1000
+group_number_list = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+# client_number = 100
+# group_number_list = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
 
 # datagenerate
 base_data_rate = 1  # 随即生成地面真值之后乘以的倍数(更加分散)
@@ -21,7 +21,7 @@ extreme_client_number = 0  # 提交极端值的用户个数
 extreme_task_rate = 1  # 提交极端值的用户任务极端的比率 越接近1 越多
 error_rate_ = 10000
 error_rate = 3
-extreme_detection_prior_number = 15  # 表示具有先验知识的任务个数
+extreme_detection_prior_number = 10  # 表示具有先验知识的任务个数
 spite_client_vs_error_client = 1000  # 恶意用户和传感器偏差的可能 该数值越大,则越有可能是恶意用户0-1000
 extreme_detection_flag = True  # 是否进行极端值检测
 extreme_detection_flag_ = True  # 对比方案是否进行极端值检测

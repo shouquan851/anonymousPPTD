@@ -80,8 +80,11 @@ def run_once():
     seed_list, all_data_index_list = anonyMousePPTD.DR_init()
     anonyMousePPTD.client_init(seed_list, all_data_index_list)
     all_client_masking_data = anonyMousePPTD.client_upload_data_(anonymousEdgePPTD.all_client_data)
+    data_miss_list = list()
+    for j in range(int(params.miss_rate * params.K)):
+        data_miss_list.append(j)
     anonymous_all_client_data = anonyMousePPTD.as_aggregation_masking_data(all_client_masking_data,
-                                                                           data_miss_list_all_group,
+                                                                           data_miss_list,
                                                                            anonymousEdgePPTD.data_section)
     td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
     print("真值发现结果")
@@ -196,8 +199,11 @@ def run_test_computation():
         seed_list, all_data_index_list = anonyMousePPTD.DR_init()
         anonyMousePPTD.client_init(seed_list, all_data_index_list)
         all_client_masking_data = anonyMousePPTD.client_upload_data_(anonymousEdgePPTD.all_client_data)
+        data_miss_list = list()
+        for j in range(int(params.miss_rate * params.K)):
+            data_miss_list.append(j)
         anonymous_all_client_data = anonyMousePPTD.as_aggregation_masking_data(all_client_masking_data,
-                                                                               data_miss_list_all_group,
+                                                                               data_miss_list,
                                                                                anonymousEdgePPTD.data_section)
         td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
         print("真值发现结果")
@@ -240,19 +246,19 @@ def run_test_accuracy():
                                  ["K", "extreme_client_number", "TD_RMSE", "Outlier_RMSE", "ODPPTD_RMSE", "AN_RMSE"])
 
     # 生成原始数据和极端值检测区间
-    # dataGenerator = DataGenerator()
-    # dataGenerator.generate_base_data(params.base_data_rate, params.base_data_start, params.base_data_end,
-    #                                  params.reliable_client_rate)
-    # dataGenerator.generate_client_data()
-    # print(dataGenerator.base_data)
-    # dataGenerator.sava_all_client_data("D:/workPlace/researchRecord/anonymousPPTD/testResult/", "client_data.csv")
-    # dataGenerator.read_all_client_data("D:/workPlace/researchRecord/anonymousPPTD/testResult/", "client_data.csv")
-    # print(dataGenerator.base_data)
-    # dataGenerator.generate_datection_section()
+    dataGenerator = DataGenerator()
+    dataGenerator.generate_base_data(params.base_data_rate, params.base_data_start, params.base_data_end,
+                                     params.reliable_client_rate)
+    dataGenerator.generate_client_data()
+    print(dataGenerator.base_data)
+    dataGenerator.sava_all_client_data("D:/workPlace/researchRecord/anonymousPPTD/testResult/", "client_data.csv")
+    dataGenerator.read_all_client_data("D:/workPlace/researchRecord/anonymousPPTD/testResult/", "client_data.csv")
+    print(dataGenerator.base_data)
+    dataGenerator.generate_datection_section()
 
     params.extreme_client_number = 20
     params.miss_rate = 0
-    for i in range(10):
+    for i in range(20):
         print("开始第%d轮：-------------------------" % (i))
         # 初始化参数
         params.miss_rate = i*5 / 100
@@ -334,8 +340,11 @@ def run_test_accuracy():
         seed_list, all_data_index_list = anonyMousePPTD.DR_init()
         anonyMousePPTD.client_init(seed_list, all_data_index_list)
         all_client_masking_data = anonyMousePPTD.client_upload_data_(temp_client_data)
+        data_miss_list = list()
+        for j in range(int(params.miss_rate * params.K)):
+            data_miss_list.append(j)
         anonymous_all_client_data = anonyMousePPTD.as_aggregation_masking_data(all_client_masking_data,
-                                                                               data_miss_list_all_group,
+                                                                               data_miss_list,
                                                                                anonymousEdgePPTD.data_section)
         td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
         print("真值发现结果")

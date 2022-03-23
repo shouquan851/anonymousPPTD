@@ -50,8 +50,8 @@ class AnonyMousePPTD:
         self.client_manager.generate_masking_data()
         return self.client_manager.all_client_masking_data
 
-    def as_aggregation_masking_data(self, all_client_masking_data, data_miss_list_all_group, data_section):
-        self.AS.aggregation_masking_data_all_client(all_client_masking_data, data_miss_list_all_group)
+    def as_aggregation_masking_data(self, all_client_masking_data, data_miss_list, data_section):
+        self.AS.aggregation_masking_data_all_client(all_client_masking_data, data_miss_list)
         # 生成检测区间
         data_section_sifenwei = DetectOutliers.detect_outliers(self.AS.anonymous_all_client_data, params.alpha)
         print("data_section_sifenwei")
