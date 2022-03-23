@@ -1,14 +1,12 @@
-import copy
 import hashlib
 import random
 import time
 
-import numpy as numpy
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import dh
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from gmssl import func
+
 
 import params
 
@@ -99,14 +97,14 @@ class Encrypt:
     @staticmethod
     def hash_random(plaintext: int):
         # hex_temp = hashlib.md5(bytes(plaintext)).hexdigest()[0:5]
-        hex_temp = hashlib.md5(plaintext.to_bytes(4, byteorder='big')).hexdigest()[0:5]  # 更快
+        hex_temp = hashlib.sha256(plaintext.to_bytes(4, byteorder='big')).hexdigest()[0:5]  # 更快
         temp = Encrypt.hashCode(hex_temp)
         return temp
 
     @staticmethod
     def hash_random_(plaintext: int):
-        # hex_temp = hashlib.sha1(bytes(plaintext)).hexdigest()[0:5]
-        hex_temp = hashlib.md5(plaintext.to_bytes(4, byteorder='big')).hexdigest()[0:5]
+        # hex_temp = hashlib.md5(bytes(plaintext)).hexdigest()[0:5]
+        hex_temp = hashlib.sha1(plaintext.to_bytes(4, byteorder='big')).hexdigest()[0:5]  # 更快
         temp = Encrypt.hashCode(hex_temp)
         return temp
 
@@ -118,6 +116,8 @@ class Encrypt:
         return temp % params.prf_p
 
 
+
+
 # if __name__ == '__main__':
 #     print('PyCharm')
 # encrypt = Encrypt(params.p, params.g)
@@ -127,6 +127,7 @@ class Encrypt:
 # key1 = encrypt.generate_aes_key(b_pri, b_pub, a_pub)
 # print(key)
 # print(key1)
+# print(len(key))
 # print(key == key1)
 # print(Encrypt.aes_decryptor(key, Encrypt.aes_encryptor(key, b"a" * 16)))
 #
@@ -182,14 +183,15 @@ class Encrypt:
 # print(start_2-start_1)
 # print(start_3-start_2)
 
-# start = time.perf_counter()
-# for i in range(100):
-#     Encrypt.hash_random(1000000)
-# end = time.perf_counter()
-# print((end - start) * 1000)
-#
-# start = time.perf_counter()
-# for i in range(100):
-#     Encrypt.hash_random_(1000000)
-# end = time.perf_counter()
-# print((end - start) * 1000)
+start = time.perf_counter()
+for i in range(100):
+    Encrypt.hash_random(1000000)
+end = time.perf_counter()
+print((end - start) * 1000)
+
+start = time.perf_counter()
+random.seed(10000000)
+for i in range(100):
+    Encrypt.hash_random_(1000000)
+end = time.perf_counter()
+print((end - start) * 1000)

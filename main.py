@@ -237,7 +237,7 @@ def run_test_computation():
 def run_test_accuracy():
     TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
                                  "test_accuracy_withdraw_result.csv",
-                                 ["K", "miss_rate", "TD_RMSE", "Outlier_RMSE", "ODPPTD_RMSE", "AN_RMSE"])
+                                 ["K", "extreme_client_number", "TD_RMSE", "Outlier_RMSE", "ODPPTD_RMSE", "AN_RMSE"])
 
     # 生成原始数据和极端值检测区间
     # dataGenerator = DataGenerator()
@@ -251,12 +251,12 @@ def run_test_accuracy():
     # dataGenerator.generate_datection_section()
 
     params.extreme_client_number = 20
-
-    for i in range(20):
+    params.miss_rate = 0
+    for i in range(10):
         print("开始第%d轮：-------------------------" % (i))
         # 初始化参数
-        params.miss_rate = i / 100
-
+        params.miss_rate = i*5 / 100
+        # params.extreme_client_number = 20- i*2
         # 初始化
         anonymousEdgePPTD = AnonymousEdgePPTD()
         # 密钥和随机种子协商
@@ -283,6 +283,7 @@ def run_test_accuracy():
         #                                                                      de_all_group_client_data_index)  # 生成要上传的数据
         # 掉线用户
         data_miss_list_all_group = anonymousEdgePPTD.generate_data_miss_list_(params.miss_rate)
+        print(data_miss_list_all_group)
         # client_encrypt_ru_all_group = anonymousEdgePPTD.clientManager.client_encrypt_ru_all_group
         # # 边缘节点聚合客户端数据
         # anonymousEdgePPTD.edge_aggregation_client_data(client_masking_data_all_group, data_miss_list_all_group)
@@ -297,7 +298,7 @@ def run_test_accuracy():
         # 准确率测试专用
         anonymous_all_client_data = anonymousEdgePPTD.cloud_server_aggregation_edge_masking_data_(
             data_miss_list_all_group,
-            temp_client_data
+            anonymousEdgePPTD.all_client_data
             , anonymousEdgePPTD.data_section)
 
         print("*************************开始进行真值发现,并计算准确率********************************")
@@ -332,7 +333,7 @@ def run_test_accuracy():
         # DR生成有各个用户的随机数种子，以及数据添加位置
         seed_list, all_data_index_list = anonyMousePPTD.DR_init()
         anonyMousePPTD.client_init(seed_list, all_data_index_list)
-        all_client_masking_data = anonyMousePPTD.client_upload_data_(anonymousEdgePPTD.all_client_data)
+        all_client_masking_data = anonyMousePPTD.client_upload_data_(temp_client_data)
         anonymous_all_client_data = anonyMousePPTD.as_aggregation_masking_data(all_client_masking_data,
                                                                                data_miss_list_all_group,
                                                                                anonymousEdgePPTD.data_section)
@@ -343,12 +344,12 @@ def run_test_accuracy():
 
         TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
                                      "test_accuracy_withdraw_result.csv",
-                                     [params.K, params.miss_rate, TD_original_RMSE,
+                                     [params.K, params.extreme_client_number, TD_original_RMSE,
                                       TD_Outlier_RMSE,
                                       ODPPTD_Outlier_RMSE,
                                       AN_Outlier_RMSE])
 
 
 # run_once()
-run_test_computation()
-# run_test_accuracy()
+# run_test_computation()
+run_test_accuracy()

@@ -56,7 +56,12 @@ class AnonyMousePPTD:
         data_section_sifenwei = DetectOutliers.detect_outliers(self.AS.anonymous_all_client_data, params.alpha)
         print("data_section_sifenwei")
         print(data_section_sifenwei)
-        self.AS.detection_extreme_data(data_section_sifenwei)
+        for m in range(params.M - params.extreme_detection_prior_number):
+            data_section[m + params.extreme_detection_prior_number][0] = \
+            data_section_sifenwei[m + params.extreme_detection_prior_number][0]
+            data_section[m + params.extreme_detection_prior_number][1] = \
+            data_section_sifenwei[m + params.extreme_detection_prior_number][1]
+        self.AS.detection_extreme_data(data_section)
         return self.AS.anonymous_all_client_data
 
     def as_td(self, anonymous_all_client_data):

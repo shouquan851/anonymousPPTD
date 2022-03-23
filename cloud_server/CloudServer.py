@@ -260,6 +260,7 @@ class CloudServer:
                     if self.anonymous_all_client_data[k][m] < data_section[m][0] or data_section[m][1] < \
                             self.anonymous_all_client_data[k][m]:
                         extreme_data_list.append(self.anonymous_all_client_data[k])
+                        # self.anonymous_all_client_data[k][m] = data_section[m][1]
                         break
         for extreme_data in extreme_data_list:
             # print(extreme_data)

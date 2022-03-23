@@ -127,7 +127,7 @@ class AnonymousEdgePPTD:
             for m in range(params.M):
                 # 恶意用户情况下的极端值
                 if self.extreme_data_index[k][m] == 1:
-                    self.all_client_data[k][m] = params.extreme_data
+                    self.all_client_data[k][m] = self.all_client_data[k][m] * params.error_rate_
                 if self.extreme_data_index[k][m] == 2:
                     self.all_client_data[k][m] = self.all_client_data[k][m] * params.error_rate
 
@@ -228,12 +228,15 @@ class AnonymousEdgePPTD:
 
     def cloud_server_detection_extreme_data(self, data_section):
         # 检测极端值
-        # 生成检测区间
         data_section_sifenwei = DetectOutliers.detect_outliers(self.cloudServer.anonymous_all_client_data,params.alpha)
         print("data_section_sifenwei")
         print(data_section_sifenwei)
+        for m in range(params.M - params.extreme_detection_prior_number):
+            data_section[m + params.extreme_detection_prior_number][0] = \
+                data_section_sifenwei[m + params.extreme_detection_prior_number][0]
+            data_section[m + params.extreme_detection_prior_number][1] = \
+                data_section_sifenwei[m + params.extreme_detection_prior_number][1]
         self.cloudServer.detection_extreme_data(data_section)
-        self.cloudServer.detection_extreme_data(data_section_sifenwei)
         return self.cloudServer.anonymous_all_client_data
 
     def cloud_server_aggregation_edge_masking_data_(self, data_miss_list_all_group, anonymous_all_client_data,
