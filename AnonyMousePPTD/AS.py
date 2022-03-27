@@ -49,7 +49,8 @@ class AS:
                         # extreme_data_list.append(self.anonymous_all_client_data[k])
                         self.anonymous_all_client_data[k][m] = (data_section[m][1] - data_section[m][0])/2
         for extreme_data in extreme_data_list:
-            self.anonymous_all_client_data.remove(extreme_data)
+            if extreme_data in self.anonymous_all_client_data:
+                self.anonymous_all_client_data.remove(extreme_data)
         end_time = time.perf_counter()
         self.extream_detection_time += (end_time - start_time) * 1000
 

@@ -1,3 +1,5 @@
+import time
+
 import params
 from AnonyMousePPTD.AS import AS
 from AnonyMousePPTD.ClientManage import ClientManage
@@ -11,11 +13,13 @@ class AnonyMousePPTD:
     client_manager = None
     AS = None
     dataGenerator = None
+    cloud_server_detection_extreme_data_time = 0
 
     def __init__(self):
         self.DR = DR()
         self.client_manager = ClientManage()
         self.AS = AS()
+        self.cloud_server_detection_extreme_data_time = 0
         # self.dataGenerator = DataGenerator()
         print("对比方案初始化完成")
 
@@ -45,7 +49,7 @@ class AnonyMousePPTD:
 
     def client_upload_data_(self, all_client_data):
         self.client_manager.load_data(all_client_data)
-        self.client_manager.generate_noise(2)
+        self.client_manager.generate_noise(1)
         # self.client_manager.verify_noise_data()
         self.client_manager.generate_masking_data()
         return self.client_manager.all_client_masking_data
@@ -53,15 +57,18 @@ class AnonyMousePPTD:
     def as_aggregation_masking_data(self, all_client_masking_data, data_miss_list, data_section):
         self.AS.aggregation_masking_data_all_client(all_client_masking_data, data_miss_list)
         # 生成检测区间
+        start_time = time.perf_counter()
         data_section_sifenwei = DetectOutliers.detect_outliers(self.AS.anonymous_all_client_data, params.alpha)
         print("data_section_sifenwei")
         print(data_section_sifenwei)
         for m in range(params.M - params.extreme_detection_prior_number):
             data_section[m + params.extreme_detection_prior_number][0] = \
-            data_section_sifenwei[m + params.extreme_detection_prior_number][0]
+                data_section_sifenwei[m + params.extreme_detection_prior_number][0]
             data_section[m + params.extreme_detection_prior_number][1] = \
-            data_section_sifenwei[m + params.extreme_detection_prior_number][1]
+                data_section_sifenwei[m + params.extreme_detection_prior_number][1]
         self.AS.detection_extreme_data(data_section)
+        end_time = time.perf_counter()
+        self.cloud_server_detection_extreme_data_time = (end_time - start_time) * 1000
         return self.AS.anonymous_all_client_data
 
     def as_td(self, anonymous_all_client_data):

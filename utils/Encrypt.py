@@ -183,15 +183,15 @@ class Encrypt:
 # print(start_2-start_1)
 # print(start_3-start_2)
 
-start = time.perf_counter()
-for i in range(100):
-    Encrypt.hash_random(1000000)
-end = time.perf_counter()
-print((end - start) * 1000)
-
-start = time.perf_counter()
-random.seed(10000000)
-for i in range(100):
-    Encrypt.hash_random_(1000000)
-end = time.perf_counter()
-print((end - start) * 1000)
+# start = time.perf_counter()
+# for i in range(100):
+#     Encrypt.hash_random(1000000)
+# end = time.perf_counter()
+# print((end - start) * 1000)
+#
+# start = time.perf_counter()
+# random.seed(10000000)
+# for i in range(100):
+#     Encrypt.hash_random_(1000000)
+# end = time.perf_counter()
+# print((end - start) * 1000)

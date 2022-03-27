@@ -140,7 +140,7 @@ class ClientManager:
                     Encrypt.aes_encryptor(self.aes_key_with_cloud_list_all_group[edge_index][k],
                                           self.client_ru_all_group[edge_index][k]))
                 end_time = time.perf_counter()
-                self.all_client_time += (end_time-start_time)
+                self.all_client_time += (end_time-start_time)*1000
 
             self.client_encrypt_ru_all_group.append(client_encrypt_ru_one_group)
 

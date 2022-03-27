@@ -57,7 +57,7 @@ class CloudServer:
 
     def generate_hash_noise_all_group(self, client_encrypt_ru_all_group, data_miss_list_all_group):
         """
-        云中心生成hash噪声  此处需要进一步优化
+        云中心生成hash噪声  此处需要进一步优化 旧版本 已废弃
         :param client_encrypt_ru_all_group:
         :return:
         """
@@ -259,12 +259,14 @@ class CloudServer:
                 if params.extreme_detection_flag:
                     if self.anonymous_all_client_data[k][m] < data_section[m][0] or data_section[m][1] < \
                             self.anonymous_all_client_data[k][m]:
-                        extreme_data_list.append(self.anonymous_all_client_data[k])
-                        # self.anonymous_all_client_data[k][m] = data_section[m][1]
-                        break
+                        # extreme_data_list.append(self.anonymous_all_client_data[k])
+                        # self.anonymous_all_client_data[k][m] = 0
+                        self.anonymous_all_client_data[k][m] = (data_section[m][1] - data_section[m][0]) / 2
+                        # break
         for extreme_data in extreme_data_list:
             # print(extreme_data)
-            self.anonymous_all_client_data.remove(extreme_data)
+            if extreme_data in self.anonymous_all_client_data:
+                self.anonymous_all_client_data.remove(extreme_data)
         end_time = time.perf_counter()
         self.extream_detection_time += (end_time - start_time) * 1000
 

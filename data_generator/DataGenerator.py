@@ -61,7 +61,7 @@ class DataGenerator:
             self.data_section.append(data_section_one_task)
 
     def sava_all_client_data(self, file_path, file_name):
-        TestUtils.write_csv_one_line_title(file_path, file_name, self.base_data)
+        TestUtils.write_csv_one_line_title_(file_path, file_name, self.base_data)
         for client_data in self.all_client_data:
             TestUtils.write_csv_one_line(file_path, file_name, client_data)
 

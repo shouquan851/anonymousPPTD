@@ -22,6 +22,7 @@ class AnonymousEdgePPTD:
     all_client_data = list()
     origin_client_data = list()
     data_section = list()
+    cloud_server_detection_extreme_data_time = 0
 
     def __init__(self):
         self.clientManager = ClientManager()
@@ -34,6 +35,7 @@ class AnonymousEdgePPTD:
         self.all_client_data = list()
         self.origin_client_data = list()
         self.data_section = list()
+        self.cloud_server_detection_extreme_data_time = 0
         print("init Application")
 
     def key_agreement(self):
@@ -234,7 +236,8 @@ class AnonymousEdgePPTD:
 
     def cloud_server_detection_extreme_data(self, data_section):
         # 检测极端值
-        data_section_sifenwei = DetectOutliers.detect_outliers(self.cloudServer.anonymous_all_client_data,params.alpha)
+        start_time = time.perf_counter()
+        data_section_sifenwei = DetectOutliers.detect_outliers(self.cloudServer.anonymous_all_client_data, params.alpha)
         print("data_section_sifenwei")
         print(data_section_sifenwei)
         for m in range(params.M - params.extreme_detection_prior_number):
@@ -243,6 +246,8 @@ class AnonymousEdgePPTD:
             data_section[m + params.extreme_detection_prior_number][1] = \
                 data_section_sifenwei[m + params.extreme_detection_prior_number][1]
         self.cloudServer.detection_extreme_data(data_section)
+        end_time = time.perf_counter()
+        self.cloud_server_detection_extreme_data_time = (end_time - start_time) * 1000
         return self.cloudServer.anonymous_all_client_data
 
     def cloud_server_aggregation_edge_masking_data_(self, data_miss_list_all_group, anonymous_all_client_data,
