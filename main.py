@@ -112,17 +112,17 @@ def run_once():
 def run_test_computation():
     params.K = 0
     # test_result_list = list()
-    # TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
-    #                              "test_computation_result.csv",
-    #                              ["K", "ODPPTD_one_client_time", "ODPPTD_index_edge_time",
-    #                               "ODPPTD_aggregation_and_upload_edge_time",
-    #                               "ODPPTD_cloud_server_aggreate_time", "ODPPTD_cloud_server_generate_hash_noise_time",
-    #                               "all_edge_add_cloud",
-    #                               "cloud_server_detection_extreme_data_time",
-    #                               "one_client_time", "cloud_server_aggreate_time",
-    #                               "cloud_server_detection_extreme_data_time"])
-    for a in range(14):
-        params.K = 2600 - a * 200
+    TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
+                                 "test_computation_M_5_result.csv",
+                                 ["N", "K", "ODPPTD_one_client_time", "ODPPTD_index_edge_time",
+                                  "ODPPTD_aggregation_and_upload_edge_time",
+                                  "ODPPTD_cloud_server_aggreate_time", "ODPPTD_cloud_server_generate_hash_noise_time",
+                                  "all_edge_add_cloud",
+                                  "cloud_server_detection_extreme_data_time",
+                                  "one_client_time", "cloud_server_aggreate_time",
+                                  "cloud_server_detection_extreme_data_time"])
+    for a in range(1):
+        params.K = (a + 1) * 200
         for i in range(10):
             print("开始第%d轮：-------------------------" % i)
             # 初始化参数
@@ -208,8 +208,8 @@ def run_test_computation():
                         0]) * params.edge_number + anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time + anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time,
                    anonymousEdgePPTD.cloud_server_detection_extreme_data_time])
             TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
-                                         "test_computation_result.csv",
-                                         [params.K,
+                                         "test_computation_M_5_result.csv",
+                                         [params.edge_number, params.K,
                                           anonymousEdgePPTD.clientManager.all_client_time / params.client_number,
                                           anonymousEdgePPTD.edgeManager.index_edge_time[0],
                                           anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time[0],
@@ -276,8 +276,12 @@ def run_test_computation():
 
 def run_test_accuracy():
     TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
-                                 "test_accuracy_withdraw_result.csv",
-                                 ["K", "extreme_client_number", "TD_RMSE", "Outlier_RMSE", "ODPPTD_RMSE", "AN_RMSE"])
+                                 "test_accuracy_no_outliers_withdraw_result.csv",
+                                 ["params.K", "params.miss_rate", "params.extreme_client_number", " TD_original_RMSE",
+                                  "TD_original_MAE",
+                                  "TD_Outlier_RMSE", "TD_Outlier_MAE",
+                                  "ODPPTD_Outlier_RMSE", "ODPPTD_Outlier_MAE",
+                                  "AN_Outlier_RMSE", " AN_Outlier_MAE"])
 
     # 生成原始数据和极端值检测区间
     dataGenerator = DataGenerator()
@@ -293,11 +297,12 @@ def run_test_accuracy():
     print(dataGenerator.base_data)
     dataGenerator.generate_datection_section()
 
-    params.extreme_client_number = 20
+    params.extreme_client_number = 0
     params.miss_rate = 0
-    for i in range(1):
+    for i in range(11):
         # 初始化参数
-        params.miss_rate = 8 * 2 / 100
+        params.miss_rate = i * 2 / 100
+        # params.extreme_client_number = i*2
         for j in range(10):
             print("掉线率为%f,开始第%d轮:" % (params.miss_rate, j))
             # 初始化
@@ -353,14 +358,18 @@ def run_test_accuracy():
             print("原始数据真值发现结果")
             print(td_result_original_data)
             TD_original_RMSE = TestUtils.get_RMSE(td_result_original_data, anonymousEdgePPTD.base_data_list)
+            TD_original_MAE = TestUtils.get_MAE(td_result_original_data, anonymousEdgePPTD.base_data_list)
             print("直接TD的RMSE = %f" % TD_original_RMSE)
+            print("直接TD的MAE = %f" % TD_original_MAE)
 
             # 对有离群值数据做TD
             td_result_original_data = anonymousEdgePPTD.original_data_TD(temp_client_data)
             print("有离群值数据直接真值发现结果")
             print(td_result_original_data)
             TD_Outlier_RMSE = TestUtils.get_RMSE(td_result_original_data, anonymousEdgePPTD.base_data_list)
+            TD_Outlier_MAE = TestUtils.get_MAE(td_result_original_data, anonymousEdgePPTD.base_data_list)
             print("有离群值数据直接真值发现结果RMSE = %f" % TD_Outlier_RMSE)
+            print("有离群值数据直接真值发现结果MAE = %f" % TD_Outlier_MAE)
 
             # 云中心执行TD
             print("云中心TD")
@@ -369,7 +378,10 @@ def run_test_accuracy():
             print(td_result_anonymous_all_client_data)
             ODPPTD_Outlier_RMSE = TestUtils.get_RMSE(td_result_anonymous_all_client_data,
                                                      anonymousEdgePPTD.base_data_list)
+            ODPPTD_Outlier_MAE = TestUtils.get_MAE(td_result_anonymous_all_client_data,
+                                                   anonymousEdgePPTD.base_data_list)
             print("本方案RMSE = %f" % ODPPTD_Outlier_RMSE)
+            print("本方案MAE = %f" % ODPPTD_Outlier_MAE)
 
             # 执行对比方案
             print("************************************************************************")
@@ -389,14 +401,22 @@ def run_test_accuracy():
             td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
             print("真值发现结果")
             AN_Outlier_RMSE = TestUtils.get_RMSE(td_result_anonymous_all_client_data, anonymousEdgePPTD.base_data_list)
+            AN_Outlier_MAE = TestUtils.get_MAE(td_result_anonymous_all_client_data, anonymousEdgePPTD.base_data_list)
             print("对比方案RMSE = %f" % AN_Outlier_RMSE)
+            print("对比方案MAE = %f" % AN_Outlier_MAE)
 
             TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
-                                         "test_accuracy_withdraw_result.csv",
-                                         [params.K, params.miss_rate, TD_original_RMSE,
-                                          TD_Outlier_RMSE,
-                                          ODPPTD_Outlier_RMSE,
-                                          AN_Outlier_RMSE])
+                                         "test_accuracy_no_outliers_withdraw_result.csv",
+                                         [params.K, params.miss_rate, params.extreme_client_number, TD_original_RMSE,
+                                          TD_original_MAE,
+                                          TD_Outlier_RMSE, TD_Outlier_MAE,
+                                          ODPPTD_Outlier_RMSE, ODPPTD_Outlier_MAE])
+            TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
+                                         "test_accuracy_no_outliers_withdraw_result.csv",
+                                         [params.K, params.miss_rate, params.extreme_client_number,TD_original_RMSE, TD_original_MAE,
+                                          TD_Outlier_RMSE, TD_Outlier_MAE,
+                                          ODPPTD_Outlier_RMSE, ODPPTD_Outlier_MAE,
+                                          AN_Outlier_RMSE, AN_Outlier_MAE])
 
 
 # run_once()

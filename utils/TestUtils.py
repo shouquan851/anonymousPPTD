@@ -15,6 +15,14 @@ class TestUtils:
         return (temp / M) ** 0.5
 
     @staticmethod
+    def get_MAE(result_list, truth_list):
+        M = len(result_list)
+        temp = 0
+        for m in range(M):
+            temp = temp + abs(result_list[m] - truth_list[m])
+        return (temp / M)
+
+    @staticmethod
     def write_csv(file_path, file_name, data_list):
         # !/usr/bin/python3
         # -*- coding: utf-8 -*-

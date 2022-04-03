@@ -1,13 +1,19 @@
+# edge_number = 5
+# client_number = 1000
+# group_number_list = [200, 200, 200, 200, 200]
 edge_number = 10
 client_number = 1000
-group_number_list = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+group_number_list = [100, 100, 100, 100, 100,100, 100, 100, 100, 100]
+# edge_number = 1
+# client_number = 1000
+# group_number_list = [1000]
 # client_number = 100
 # group_number_list = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
 
 # datagenerate
 base_data_rate = 1  # 随即生成地面真值之后乘以的倍数(更加分散)
 base_data_start = 1  # 随机生成地面真值的起点
-base_data_end = 1000  # 随机生成地面真值的终点
+base_data_end = 200  # 随机生成地面真值的终点
 reliable_client_rate = 70  # 可靠用户的比例,0-100 越接近100 可靠用户越多
 unreliable_start = 70
 unreliable_end = 85
@@ -19,8 +25,8 @@ miss_rate = 0/100  # 用户掉线情况 0表示不缺失,越接近1 缺失越多
 extreme_client_rate = 0/1000  # 提交极端值的用户比率 越接近1 越多
 extreme_client_number = 0  # 提交极端值的用户个数
 extreme_task_rate = 1  # 提交极端值的用户任务极端的比率 越接近1 越多
-error_rate_ = 10000
-error_rate = 3
+error_rate_ = 1000
+error_rate = 10
 extreme_detection_prior_number = 10  # 表示具有先验知识的任务个数
 spite_client_vs_error_client = 1000  # 恶意用户和传感器偏差的可能 该数值越大,则越有可能是恶意用户0-1000
 extreme_detection_flag = True  # 是否进行极端值检测
