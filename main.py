@@ -111,9 +111,8 @@ def run_once():
 
 def run_test_computation():
     params.K = 0
-    # test_result_list = list()
     TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
-                                 "test_computation_M_5_result.csv",
+                                 "test_computation_M_10_result__.csv",
                                  ["N", "K", "ODPPTD_one_client_time", "ODPPTD_index_edge_time",
                                   "ODPPTD_aggregation_and_upload_edge_time",
                                   "ODPPTD_cloud_server_aggreate_time", "ODPPTD_cloud_server_generate_hash_noise_time",
@@ -121,9 +120,10 @@ def run_test_computation():
                                   "cloud_server_detection_extreme_data_time",
                                   "one_client_time", "cloud_server_aggreate_time",
                                   "cloud_server_detection_extreme_data_time"])
-    for a in range(1):
-        params.K = (a + 1) * 200
-        for i in range(10):
+    for a in range(20):
+        params.K = 4000 - a * 200
+
+        for i in range(1):
             print("开始第%d轮：-------------------------" % i)
             # 初始化参数
             params.K += 0
@@ -207,8 +207,59 @@ def run_test_computation():
                     anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time[
                         0]) * params.edge_number + anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time + anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time,
                    anonymousEdgePPTD.cloud_server_detection_extreme_data_time])
+            # TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
+            #                              "test_computation_M_5_result.csv",
+            #                              [params.edge_number, params.K,
+            #                               anonymousEdgePPTD.clientManager.all_client_time / params.client_number,
+            #                               anonymousEdgePPTD.edgeManager.index_edge_time[0],
+            #                               anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time[0],
+            #                               anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time,
+            #                               anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time,
+            #                               (anonymousEdgePPTD.edgeManager.index_edge_time[0] +
+            #                                anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time[
+            #                                    0]) * params.edge_number + anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time + anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time,
+            #                               anonymousEdgePPTD.cloud_server_detection_extreme_data_time])
+            # 执行对比方案
+            print("************************************************************************")
+            print("执行对比方案")
+            # 初始化
+            anonyMousePPTD = AnonyMousePPTD()
+            # DR生成有各个用户的随机数种子，以及数据添加位置
+            seed_list, all_data_index_list = anonyMousePPTD.DR_init()
+            anonyMousePPTD.client_init(seed_list, all_data_index_list)
+            all_client_masking_data = anonyMousePPTD.client_upload_data_(anonymousEdgePPTD.all_client_data)
+            data_miss_list = list()
+            for j in range(int(params.miss_rate * params.K)):
+                data_miss_list.append(j)
+            anonymous_all_client_data = anonyMousePPTD.as_aggregation_masking_data(all_client_masking_data,
+                                                                                   data_miss_list,
+                                                                                   anonymousEdgePPTD.data_section)
+            td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
+            print("真值发现结果")
+            print(td_result_anonymous_all_client_data)
+            print("对比方案RMSE = %f" % (
+                TestUtils.get_RMSE(td_result_anonymous_all_client_data, anonymousEdgePPTD.base_data_list)))
+
+            print("***********************计算开销******************************")
+
+            print("边缘节点个数:%d,用户个数:%d" % (params.edge_number, params.K))
+            print("本方案运行时间")
+            print("one_client_time = %f" % (anonymousEdgePPTD.clientManager.all_client_time / params.client_number))
+            print("index_edge_time:")
+            print(anonymousEdgePPTD.edgeManager.index_edge_time)
+            print("aggregation_and_upload_edge_time:")
+            print(anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time)
+            print(
+                "cloud_server_aggreate_time=%f,cloud_server_generate_hash_noise_time=%f" % (
+                    anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time,
+                    anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time))
+
+            print("对比方案运行时间")
+            print("one client_time = %f" % (anonyMousePPTD.client_manager.all_client_time / params.client_number))
+            print("cloud_server_aggreate_time=%f" % anonyMousePPTD.AS.cloud_server_aggreate_time)
+
             TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
-                                         "test_computation_M_5_result.csv",
+                                         "test_computation_M_10_result__.csv",
                                          [params.edge_number, params.K,
                                           anonymousEdgePPTD.clientManager.all_client_time / params.client_number,
                                           anonymousEdgePPTD.edgeManager.index_edge_time[0],
@@ -218,60 +269,10 @@ def run_test_computation():
                                           (anonymousEdgePPTD.edgeManager.index_edge_time[0] +
                                            anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time[
                                                0]) * params.edge_number + anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time + anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time,
-                                          anonymousEdgePPTD.cloud_server_detection_extreme_data_time])
-            # 执行对比方案
-            # print("************************************************************************")
-            # print("执行对比方案")
-            # # 初始化
-            # anonyMousePPTD = AnonyMousePPTD()
-            # # DR生成有各个用户的随机数种子，以及数据添加位置
-            # seed_list, all_data_index_list = anonyMousePPTD.DR_init()
-            # anonyMousePPTD.client_init(seed_list, all_data_index_list)
-            # all_client_masking_data = anonyMousePPTD.client_upload_data_(anonymousEdgePPTD.all_client_data)
-            # data_miss_list = list()
-            # for j in range(int(params.miss_rate * params.K)):
-            #     data_miss_list.append(j)
-            # anonymous_all_client_data = anonyMousePPTD.as_aggregation_masking_data(all_client_masking_data,
-            #                                                                        data_miss_list,
-            #                                                                        anonymousEdgePPTD.data_section)
-            # td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
-            # print("真值发现结果")
-            # print(td_result_anonymous_all_client_data)
-            # print("对比方案RMSE = %f" % (
-            #     TestUtils.get_RMSE(td_result_anonymous_all_client_data, anonymousEdgePPTD.base_data_list)))
-            #
-            # print("***********************计算开销******************************")
-            #
-            # print("边缘节点个数:%d,用户个数:%d" % (params.edge_number, params.K))
-            # print("本方案运行时间")
-            # print("one_client_time = %f" % (anonymousEdgePPTD.clientManager.all_client_time / params.client_number))
-            # print("index_edge_time:")
-            # print(anonymousEdgePPTD.edgeManager.index_edge_time)
-            # print("aggregation_and_upload_edge_time:")
-            # print(anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time)
-            # print(
-            #     "cloud_server_aggreate_time=%f,cloud_server_generate_hash_noise_time=%f" % (
-            #         anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time,
-            #         anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time))
-            #
-            # print("对比方案运行时间")
-            # print("one client_time = %f" % (anonyMousePPTD.client_manager.all_client_time / params.client_number))
-            # print("cloud_server_aggreate_time=%f" % anonyMousePPTD.AS.cloud_server_aggreate_time)
-            #
-            # TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
-            #                              "test_computation_result.csv",
-            #                              [params.K, anonymousEdgePPTD.clientManager.all_client_time / params.client_number,
-            #                               anonymousEdgePPTD.edgeManager.index_edge_time[0],
-            #                               anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time[0],
-            #                               anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time,
-            #                               anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time,
-            #                               (anonymousEdgePPTD.edgeManager.index_edge_time[0] +
-            #                                anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time[
-            #                                    0]) * params.edge_number + anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time + anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time,
-            #                               anonymousEdgePPTD.cloud_server_detection_extreme_data_time,
-            #                               anonyMousePPTD.client_manager.all_client_time / params.client_number,
-            #                               anonyMousePPTD.AS.cloud_server_aggreate_time,
-            #                               anonyMousePPTD.cloud_server_detection_extreme_data_time])
+                                          anonymousEdgePPTD.cloud_server_detection_extreme_data_time,
+                                          anonyMousePPTD.client_manager.all_client_time / params.client_number,
+                                          anonyMousePPTD.AS.cloud_server_aggreate_time,
+                                          anonyMousePPTD.cloud_server_detection_extreme_data_time])
 
 
 def run_test_accuracy():
@@ -301,9 +302,9 @@ def run_test_accuracy():
     params.miss_rate = 0
     for i in range(11):
         # 初始化参数
-        params.miss_rate = i * 2 / 100
-        # params.extreme_client_number = i*2
-        for j in range(10):
+        # params.miss_rate = i * 2 / 100
+        params.extreme_client_number = int((i / 100) * params.K)
+        for j in range(1):
             print("掉线率为%f,开始第%d轮:" % (params.miss_rate, j))
             # 初始化
             anonymousEdgePPTD = AnonymousEdgePPTD()
@@ -384,41 +385,42 @@ def run_test_accuracy():
             print("本方案MAE = %f" % ODPPTD_Outlier_MAE)
 
             # 执行对比方案
-            print("************************************************************************")
-            print("执行对比方案")
-            # 初始化
-            anonyMousePPTD = AnonyMousePPTD()
-            # DR生成有各个用户的随机数种子，以及数据添加位置
-            seed_list, all_data_index_list = anonyMousePPTD.DR_init()
-            anonyMousePPTD.client_init(seed_list, all_data_index_list)
-            all_client_masking_data = anonyMousePPTD.client_upload_data_(temp_client_data)
-            data_miss_list = list()
-            for j in range(int(params.miss_rate * params.K)):
-                data_miss_list.append(j)
-            anonymous_all_client_data = anonyMousePPTD.as_aggregation_masking_data(all_client_masking_data,
-                                                                                   data_miss_list,
-                                                                                   anonymousEdgePPTD.data_section)
-            td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
-            print("真值发现结果")
-            AN_Outlier_RMSE = TestUtils.get_RMSE(td_result_anonymous_all_client_data, anonymousEdgePPTD.base_data_list)
-            AN_Outlier_MAE = TestUtils.get_MAE(td_result_anonymous_all_client_data, anonymousEdgePPTD.base_data_list)
-            print("对比方案RMSE = %f" % AN_Outlier_RMSE)
-            print("对比方案MAE = %f" % AN_Outlier_MAE)
+            # print("************************************************************************")
+            # print("执行对比方案")
+            # # 初始化
+            # anonyMousePPTD = AnonyMousePPTD()
+            # # DR生成有各个用户的随机数种子，以及数据添加位置
+            # seed_list, all_data_index_list = anonyMousePPTD.DR_init()
+            # anonyMousePPTD.client_init(seed_list, all_data_index_list)
+            # all_client_masking_data = anonyMousePPTD.client_upload_data_(temp_client_data)
+            # data_miss_list = list()
+            # for j in range(int(params.miss_rate * params.K)):
+            #     data_miss_list.append(j)
+            # anonymous_all_client_data = anonyMousePPTD.as_aggregation_masking_data(all_client_masking_data,
+            #                                                                        data_miss_list,
+            #                                                                        anonymousEdgePPTD.data_section)
+            # td_result_anonymous_all_client_data = anonyMousePPTD.as_td(anonymous_all_client_data)
+            # print("真值发现结果")
+            # AN_Outlier_RMSE = TestUtils.get_RMSE(td_result_anonymous_all_client_data, anonymousEdgePPTD.base_data_list)
+            # AN_Outlier_MAE = TestUtils.get_MAE(td_result_anonymous_all_client_data, anonymousEdgePPTD.base_data_list)
+            # print("对比方案RMSE = %f" % AN_Outlier_RMSE)
+            # print("对比方案MAE = %f" % AN_Outlier_MAE)
 
             TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
                                          "test_accuracy_no_outliers_withdraw_result.csv",
                                          [params.K, params.miss_rate, params.extreme_client_number, TD_original_RMSE,
                                           TD_original_MAE,
                                           TD_Outlier_RMSE, TD_Outlier_MAE,
-                                          ODPPTD_Outlier_RMSE, ODPPTD_Outlier_MAE])
-            TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
-                                         "test_accuracy_no_outliers_withdraw_result.csv",
-                                         [params.K, params.miss_rate, params.extreme_client_number,TD_original_RMSE, TD_original_MAE,
-                                          TD_Outlier_RMSE, TD_Outlier_MAE,
-                                          ODPPTD_Outlier_RMSE, ODPPTD_Outlier_MAE,
-                                          AN_Outlier_RMSE, AN_Outlier_MAE])
+                                          ODPPTD_Outlier_RMSE, ODPPTD_Outlier_MAE, "", "", params.base_data_end,
+                                          params.error_rate_])
+            # TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
+            #                              "test_accuracy_no_outliers_withdraw_result.csv",
+            #                              [params.K, params.miss_rate, params.extreme_client_number,TD_original_RMSE, TD_original_MAE,
+            #                               TD_Outlier_RMSE, TD_Outlier_MAE,
+            #                               ODPPTD_Outlier_RMSE, ODPPTD_Outlier_MAE,
+            #                               AN_Outlier_RMSE, AN_Outlier_MAE,params.base_data_end,params.error_rate_])
 
 
 # run_once()
-# run_test_computation()
-run_test_accuracy()
+run_test_computation()
+# run_test_accuracy()
