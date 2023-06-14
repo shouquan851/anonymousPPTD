@@ -43,7 +43,7 @@ class EdgeManager:
         for edge_index in range(params.edge_number):
             self.index_edge_time.append(0)
             self.aggregation_and_upload_edge_time.append(0)
-        print("init EdgeManager")
+        # print("init EdgeManager")
 
     def generate_dh_key(self, edge_count):
         encrypt = Encrypt(params.p, params.g)

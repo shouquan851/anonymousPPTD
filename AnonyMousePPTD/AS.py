@@ -46,8 +46,9 @@ class AS:
                 if params.extreme_detection_flag_:
                     if self.anonymous_all_client_data[k][m] < data_section[m][0] or data_section[m][1] < \
                             self.anonymous_all_client_data[k][m]:
-                        # extreme_data_list.append(self.anonymous_all_client_data[k])
-                        self.anonymous_all_client_data[k][m] = (data_section[m][1] - data_section[m][0])/2
+                        extreme_data_list.append(self.anonymous_all_client_data[k])
+                        break
+                        # self.anonymous_all_client_data[k][m] = (data_section[m][1] - data_section[m][0])/2
         for extreme_data in extreme_data_list:
             if extreme_data in self.anonymous_all_client_data:
                 self.anonymous_all_client_data.remove(extreme_data)

@@ -12,6 +12,7 @@ class TD_CRH:
     wk_i = list()
 
     def __init__(self, client_value_list, k, m):
+        # print("对%d个用户的值进行真值发现"%k)
         self.x_k_m = list()
         self.K = k
         self.M = m

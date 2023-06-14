@@ -113,17 +113,16 @@ def run_test_computation():
     params.K = 0
     TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
                                  "test_computation_M_10_result__.csv",
-                                 ["N", "K", "ODPPTD_one_client_time", "ODPPTD_index_edge_time",
-                                  "ODPPTD_aggregation_and_upload_edge_time",
-                                  "ODPPTD_cloud_server_aggreate_time", "ODPPTD_cloud_server_generate_hash_noise_time",
+                                 ["N", "K", "worker_time", "EN_time",
+                                  "server_time",
                                   "all_edge_add_cloud",
                                   "cloud_server_detection_extreme_data_time",
-                                  "one_client_time", "cloud_server_aggreate_time",
+                                  "worker_time", "server_time",
                                   "cloud_server_detection_extreme_data_time"])
-    for a in range(20):
-        params.K = 4000 - a * 200
+    for a in range(3):
+        params.K = 4000 - 200 * a
 
-        for i in range(1):
+        for i in range(3):
             print("开始第%d轮：-------------------------" % i)
             # 初始化参数
             params.K += 0
@@ -262,10 +261,8 @@ def run_test_computation():
                                          "test_computation_M_10_result__.csv",
                                          [params.edge_number, params.K,
                                           anonymousEdgePPTD.clientManager.all_client_time / params.client_number,
-                                          anonymousEdgePPTD.edgeManager.index_edge_time[0],
-                                          anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time[0],
-                                          anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time,
-                                          anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time,
+                                          anonymousEdgePPTD.edgeManager.index_edge_time[0] + anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time[0],
+                                          anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time + anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time,
                                           (anonymousEdgePPTD.edgeManager.index_edge_time[0] +
                                            anonymousEdgePPTD.edgeManager.aggregation_and_upload_edge_time[
                                                0]) * params.edge_number + anonymousEdgePPTD.cloudServer.cloud_server_aggreate_time + anonymousEdgePPTD.cloudServer.cloud_server_generate_hash_noise_time,
@@ -276,36 +273,65 @@ def run_test_computation():
 
 
 def run_test_accuracy():
+    # fileName = "test_accuracy_with_exit_.csv"
+    fileName = "test_accuracy_withOutliers.csv"
+    datafileName = "client_data.csv"
     TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
-                                 "test_accuracy_no_outliers_withdraw_result.csv",
+                                 fileName,
                                  ["params.K", "params.miss_rate", "params.extreme_client_number", " TD_original_RMSE",
                                   "TD_original_MAE",
                                   "TD_Outlier_RMSE", "TD_Outlier_MAE",
                                   "ODPPTD_Outlier_RMSE", "ODPPTD_Outlier_MAE",
                                   "AN_Outlier_RMSE", " AN_Outlier_MAE"])
 
-    # 生成原始数据和极端值检测区间
-    dataGenerator = DataGenerator()
-    dataGenerator.generate_base_data(params.base_data_rate, params.base_data_start, params.base_data_end,
-                                     params.reliable_client_rate)
-    print(dataGenerator.reliable_client)
-    dataGenerator.generate_client_data()
-    print(111)
-    print(dataGenerator.base_data)
-    print(111)
-    dataGenerator.sava_all_client_data("D:/workPlace/researchRecord/anonymousPPTD/testResult/", "client_data.csv")
-    dataGenerator.read_all_client_data("D:/workPlace/researchRecord/anonymousPPTD/testResult/", "client_data.csv")
-    print(dataGenerator.base_data)
-    dataGenerator.generate_datection_section()
-
-    params.extreme_client_number = 0
-    params.miss_rate = 0
-    for i in range(11):
+    # # 生成原始数据和极端值检测区间
+    # dataGenerator = DataGenerator()
+    # dataGenerator.generate_base_data(params.base_data_rate, params.base_data_start, params.base_data_end,
+    #                                  params.reliable_client_rate)
+    # print(dataGenerator.reliable_client)
+    # dataGenerator.generate_client_data()
+    # print(111)
+    # print(dataGenerator.base_data)
+    # print(111)
+    # dataGenerator.sava_all_client_data("D:/workPlace/researchRecord/anonymousPPTD/testResult/", datafileName)
+    # dataGenerator.read_all_client_data("D:/workPlace/researchRecord/anonymousPPTD/testResult/", datafileName)
+    # print(dataGenerator.base_data)
+    # dataGenerator.generate_datection_section()
+    params.alpha = 2.0
+    for i in range(3):
+        params.extreme_client_number = int(( (i+6) / 100) * params.K)
+        params.miss_rate = 0
         # 初始化参数
-        # params.miss_rate = i * 2 / 100
-        params.extreme_client_number = int((i / 100) * params.K)
-        for j in range(1):
-            print("掉线率为%f,开始第%d轮:" % (params.miss_rate, j))
+        # params.miss_rate = 0
+        # if params.extreme_client_number == 110:
+        #     if params.alpha < 2.5:
+        #         if params.alpha*10%2 == 0:
+        #             params.alpha += 0.3
+        #         else:
+        #             params.alpha += 0.2
+        #     else:
+        #         params.alpha += 1
+        #     if params.alpha > 5:
+        #         params.alpha += 5
+        #     if params.alpha > 10:
+        #         params.alpha += 10
+        #     if params.alpha == 100:
+        #         break
+        #     params.extreme_client_number = 0
+        # else:
+        #     params.extreme_client_number += 10
+
+        # if i < 10 :
+        #     params.extreme_client_number = int(( (10) / 100) * params.K)
+        #     params.miss_rate = (i + 1) / 100
+        #     # params.miss_rate = 0
+        # else:
+        #     params.extreme_client_number = int((0 / 100) * params.K)
+        #     params.miss_rate = (i + 1 - 10) / 100
+        TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/", fileName, [])
+        TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/", fileName, [])
+        for j in range(5):
+            print("掉线率为%f,非正常用户个数为%f,开始第%d轮:" % (params.miss_rate, params.extreme_client_number,j))
             # 初始化
             anonymousEdgePPTD = AnonymousEdgePPTD()
             # 密钥和随机种子协商
@@ -313,8 +339,7 @@ def run_test_accuracy():
             # 读取数据
             anonymousEdgePPTD.dataGenerator.read_all_client_data(
                 "D:/workPlace/researchRecord/anonymousPPTD/testResult/",
-
-                "client_data.csv")
+                datafileName)
             # 加载数据
             anonymousEdgePPTD.load_data()
             # 生成极端值检测区间
@@ -356,8 +381,8 @@ def run_test_accuracy():
             print("开始进行真值发现")
             # 对原始数据做TD
             td_result_original_data = anonymousEdgePPTD.original_data_TD(anonymousEdgePPTD.origin_client_data)
-            print("原始数据真值发现结果")
-            print(td_result_original_data)
+            # print("原始数据真值发现结果")
+            # print(td_result_original_data)
             TD_original_RMSE = TestUtils.get_RMSE(td_result_original_data, anonymousEdgePPTD.base_data_list)
             TD_original_MAE = TestUtils.get_MAE(td_result_original_data, anonymousEdgePPTD.base_data_list)
             print("直接TD的RMSE = %f" % TD_original_RMSE)
@@ -365,8 +390,8 @@ def run_test_accuracy():
 
             # 对有离群值数据做TD
             td_result_original_data = anonymousEdgePPTD.original_data_TD(temp_client_data)
-            print("有离群值数据直接真值发现结果")
-            print(td_result_original_data)
+            # print("有离群值数据直接真值发现结果")
+            # print(td_result_original_data)
             TD_Outlier_RMSE = TestUtils.get_RMSE(td_result_original_data, anonymousEdgePPTD.base_data_list)
             TD_Outlier_MAE = TestUtils.get_MAE(td_result_original_data, anonymousEdgePPTD.base_data_list)
             print("有离群值数据直接真值发现结果RMSE = %f" % TD_Outlier_RMSE)
@@ -375,8 +400,8 @@ def run_test_accuracy():
             # 云中心执行TD
             print("云中心TD")
             td_result_anonymous_all_client_data = anonymousEdgePPTD.cloud_server_TD(anonymous_all_client_data)
-            print("真值发现结果")
-            print(td_result_anonymous_all_client_data)
+            # print("真值发现结果")
+            # print(td_result_anonymous_all_client_data)
             ODPPTD_Outlier_RMSE = TestUtils.get_RMSE(td_result_anonymous_all_client_data,
                                                      anonymousEdgePPTD.base_data_list)
             ODPPTD_Outlier_MAE = TestUtils.get_MAE(td_result_anonymous_all_client_data,
@@ -407,20 +432,19 @@ def run_test_accuracy():
             # print("对比方案MAE = %f" % AN_Outlier_MAE)
 
             TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
-                                         "test_accuracy_no_outliers_withdraw_result.csv",
+                                         fileName,
                                          [params.K, params.miss_rate, params.extreme_client_number, TD_original_RMSE,
                                           TD_original_MAE,
                                           TD_Outlier_RMSE, TD_Outlier_MAE,
                                           ODPPTD_Outlier_RMSE, ODPPTD_Outlier_MAE, "", "", params.base_data_end,
-                                          params.error_rate_])
+                                          params.error_rate_,params.alpha])
             # TestUtils.write_csv_one_line("D:/workPlace/researchRecord/anonymousPPTD/testResult/",
-            #                              "test_accuracy_no_outliers_withdraw_result.csv",
+            #                              fileName,
             #                              [params.K, params.miss_rate, params.extreme_client_number,TD_original_RMSE, TD_original_MAE,
             #                               TD_Outlier_RMSE, TD_Outlier_MAE,
             #                               ODPPTD_Outlier_RMSE, ODPPTD_Outlier_MAE,
-            #                               AN_Outlier_RMSE, AN_Outlier_MAE,params.base_data_end,params.error_rate_])
-
+            #                               AN_Outlier_RMSE, AN_Outlier_MAE,params.base_data_end,params.error_rate_,params.alpha,len(anonymous_all_client_data)])
 
 # run_once()
-run_test_computation()
-# run_test_accuracy()
+# run_test_computation()
+run_test_accuracy()

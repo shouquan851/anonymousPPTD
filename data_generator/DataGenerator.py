@@ -17,7 +17,7 @@ class DataGenerator:
         self.reliable_client = list()
         self.all_client_data = list()
         self.data_section = list()
-        print("init DataGenerator")
+        # print("init DataGenerator")
 
     def generate_base_data(self, base_data_rate, base_data_start, base_data_end, reliable_client_rate):
         """
@@ -34,9 +34,9 @@ class DataGenerator:
         for k in range(params.K):
             temp = random.randint(0, 100)
             if temp < reliable_client_rate:
-                reliable_client.append(random.randint(params.reliable_start, params.reliable_end) / 100)
+                reliable_client.append(params.reliable_start)
             else:
-                reliable_client.append(random.randint(params.unreliable_start, params.unreliable_end) / 100)
+                reliable_client.append(params.unreliable_start)
         self.base_data = base_data
         self.reliable_client = reliable_client
 

@@ -75,9 +75,9 @@ class AnonymousEdgePPTD:
 
     def load_data(self):
         # 打印basedata
-        print("basedata")
+        # print("basedata")
         self.base_data_list = self.dataGenerator.base_data
-        print(self.dataGenerator.base_data)
+        # print(self.dataGenerator.base_data)
         self.all_client_data = self.dataGenerator.all_client_data
         self.origin_client_data = copy.deepcopy(self.all_client_data)
         return self.all_client_data
@@ -110,24 +110,23 @@ class AnonymousEdgePPTD:
         extreme_data_index = list()
         for k_ in range(k):
             extreme_data_index_one_cliet = list()
-            if extreme_client_rate > 0:
-                for m_ in range(m):
-                    extreme_data_index_one_cliet.append(0)
-                if random.randrange(0, 1000) < params.spite_client_vs_error_client:
-                    # 是恶意用户
-                    for m_ in range(int(m * extreme_task_rate)):
-                        # extreme_data_index_one_cliet.append(1)
-                        extreme_data_index_one_cliet[random.randrange(0, m)] = 1
-                else:
-                    # 是传感器偏差
-                    for m_ in range(int(m * extreme_task_rate)):
-                        # extreme_data_index_one_cliet.append(2)
-                        extreme_data_index_one_cliet[random.randrange(0, m)] = 2
-                extreme_client_rate -= 1
-            else:
-                for m_ in range(m):
-                    extreme_data_index_one_cliet.append(0)
+            for m_ in range(m):
+                extreme_data_index_one_cliet.append(0)
             extreme_data_index.append(extreme_data_index_one_cliet)
+
+        for k_ in range(extreme_client_rate):
+            k_temp = random.randrange(0, 1000)
+            # k_temp = k_
+            if random.randrange(0, 1000) < params.spite_client_vs_error_client:
+                # 是恶意用户
+                for m_ in range(int(m * extreme_task_rate)):
+                    # extreme_data_index_one_cliet.append(1)
+                    extreme_data_index[k_temp][random.randrange(0, m)] = 1
+            else:
+                # 是传感器偏差
+                for m_ in range(int(m * extreme_task_rate)):
+                        # extreme_data_index_one_cliet.append(2)
+                    extreme_data_index[k_temp][random.randrange(0, m)] = 2
         self.extreme_data_index = extreme_data_index
 
     def add_extreme_data(self):
@@ -135,7 +134,11 @@ class AnonymousEdgePPTD:
             for m in range(params.M):
                 # 恶意用户情况下的极端值
                 if self.extreme_data_index[k][m] == 1:
+                    # 生成高斯噪声,模拟用户观测不准确
+                    # noise = self.all_client_data[k][m] * random.gauss(0, params.unreliable__)
+                    # self.all_client_data[k][m] = self.all_client_data[k][m] + noise
                     self.all_client_data[k][m] = self.all_client_data[k][m] * params.error_rate_
+                    # self.all_client_data[k][m] = random.randint(int(self.all_client_data[k][m]/params.error_rate_), int(self.all_client_data[k][m] * params.error_rate_))
                 if self.extreme_data_index[k][m] == 2:
                     self.all_client_data[k][m] = self.all_client_data[k][m] * params.error_rate
 
@@ -263,6 +266,14 @@ class AnonymousEdgePPTD:
         self.cloudServer.anonymous_all_client_data = anonymous_all_client_data
 
         # 检测极端值
+        data_section_sifenwei = DetectOutliers.detect_outliers(self.cloudServer.anonymous_all_client_data, params.alpha)
+        print("data_section_sifenwei")
+        print(data_section_sifenwei)
+        for m in range(params.M - params.extreme_detection_prior_number):
+            data_section[m + params.extreme_detection_prior_number][0] = \
+                data_section_sifenwei[m + params.extreme_detection_prior_number][0]
+            data_section[m + params.extreme_detection_prior_number][1] = \
+                data_section_sifenwei[m + params.extreme_detection_prior_number][1]
         self.cloudServer.detection_extreme_data(data_section)
         return self.cloudServer.anonymous_all_client_data
 

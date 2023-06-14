@@ -26,7 +26,7 @@ class ClientManager:
         self.client_encrypt_ru_all_group = list()
         self.hash_noise_all_group = list()
         self.all_client_time = 0  # ms
-        print("init ClientManager")
+        # print("init ClientManager")
 
     def generate_dh_key(self, client_count):
         encrypt = Encrypt(params.p, params.g)
